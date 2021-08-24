@@ -1,0 +1,16 @@
+FLASK_APP='manage.py'
+FLASK_ENV=development
+SECRET_KEY='as_contabilidad_secret'
+DB_USERNAME=as_contabilidad_user
+DB_PASSWORD=as_contabilidad_password
+DB_HOST=localhost
+DATABASE_NAME=contabilidad
+MYSQL_ROOT_PASSWORD=''
+BLOG_NAME='As Contabilidad'
+BLOG_POST_IMAGES_PATH='C:\Users\julyd\OneDrive\Documents\Proyecto_papa\as_contabilidad\images'
+MAIL_SERVER='smtp.gmail.com'
+MAIL_PORT=465
+MAIL_USERNAME='juli971117@gmail.com'
+MAIL_PASSWORD='tobby1210'
+MAIL_USE_TLS=False
+MAIL_USE_SSL=True

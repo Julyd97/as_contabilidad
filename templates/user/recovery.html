@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Recuperar Contraseña{% endblock %}
+
+{% block content %}
+
+<div class="row">
+
+    <div class="offset-md-1 col-md-8 py-3" >
+        {% include '_flashmessages.html' %}
+        <h4 class="text-center">Recuperar Contraseña</h4>
+
+        {% from "_formhelpers.html" import render_field %}
+        <form method="POST" action="{{ url_for('.recovery') }}" role="form">
+
+            {{ form.hidden_tag()}}
+
+            {{ render_field(form.college_nit, class='form-control')}}
+            {{ render_field(form.email, class='form-control')}}
+
+            <button type="submit" class="btn btn-primary my-3">Enviar</button>
+
+        </form>
+    </div>
+</div>
+
+{% endblock %}

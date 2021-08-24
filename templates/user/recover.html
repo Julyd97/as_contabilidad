@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Asignar Contraseña{% endblock %}
+
+{% block content %}
+
+<div class="row">
+
+    <div class="offset-md-1 col-md-8 py-3" >
+        {% include '_flashmessages.html' %}
+        <h4 class="text-center">Nueva Contraseña</h4>
+
+        {% from "_formhelpers.html" import render_field %}
+        <form  method ="POST" action=" {{url_for('.recover',token=token) }}">
+
+            {{ form.hidden_tag()}}
+
+            {{ render_field(form.password, class='form-control')}}
+            {{ render_field(form.confirm, class='form-control')}}
+
+            <button type="submit" class="btn btn-primary my-3">Enviar</button>
+
+        </form>
+    </div>
+</div>
+
+{% endblock %}

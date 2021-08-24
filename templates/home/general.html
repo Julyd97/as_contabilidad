@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+    {% block title %}Home{% endblock %}
+    {% block link %}<link rel="stylesheet" href="{{ url_for('static', filename='generalstyle.css') }}?{{ cache_id }}">{% endblock %}
+
+{% block content %} 
+
+    <div class="row">
+        <img id="Logo" src="{{ url_for('home_app.image', filename='LogoGm.png') }}">
+    </div>
+    <div id="form" class="row">
+        <div class="row-md-6"><a type ="button" class="btn btn-primary btn-lg btn-block" href="/login">Iniciar sesión</a></div>
+        <div class="row-md-6"><a type ="button" class="btn btn-success btn-lg btn-block align-text-middle" href="/register" id="register">Solicitar cuenta nueva</a></div>
+    </div>
+
+
+{% endblock %}

@@ -1,0 +1,26 @@
+body{
+    background-image: url("/images/general-image.jpg");
+    background-size: 1200px 900px;
+
+}
+a.btn{
+    height: 50px;
+    width: 250px;
+    margin-top: 2px;
+    
+}
+#register{
+    background-color: #42b72a;
+    text-align: center;
+}
+#Logo{
+    height: 200px;
+    width: 300px;
+}
+#form{
+    background-color: whitesmoke;
+    height: 250px;
+    width: 280px;
+    margin-left: 1px;
+    align-items: center;
+}

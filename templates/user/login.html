@@ -1,0 +1,28 @@
+{% extends "base.html" %} 
+
+{% block title %}User Login{% endblock %} 
+{% block link %}<link rel="stylesheet" href="{{ url_for('static', filename='loginstyle.css') }}?{{ cache_id }}">{% endblock %}
+{% block content %}
+
+<div class="row">
+
+    <div class="offset-md-1 col-md-8 py-3" id="form">
+
+        {% include '_flashmessages.html' %}
+        <h4 class="text-center">Iniciar sesión en As Connect</h4>
+
+        {% from "_formhelpers.html" import render_field %}
+        <form method="POST" action="{{ url_for('.login') }}" role="form">
+
+            {{ form.hidden_tag() }}
+            
+            {{ render_field(form.college_nit, class='form-control') }}    
+            {{ render_field(form.email, class='form-control') }}
+            {{ render_field(form.password, class='form-control') }}
+
+            <button type="submit" class="btn btn-primary my-3" >Iniciar sesión</button>
+            <a type="button" class="btn btn-link mx-5" href="/recovery">¿Has olvidado tu contraseña?</a>
+        </form>
+    </div>
+</div>
+{% endblock %}
