@@ -22,8 +22,10 @@ def create_app(** config_overrides):
     
     from user.views import user_app
     from home.views import home_app
+    from cuentas.views import cuenta_app
     # register blueprints
     
     app.register_blueprint(user_app)
     app.register_blueprint(home_app)
+    app.register_blueprint(cuenta_app)
     return app

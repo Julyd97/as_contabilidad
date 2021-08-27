@@ -60,8 +60,9 @@ def login():
     error = None
 
     if form.validate_on_submit():
-        user = User.query.filter_by(email=form.email.data).first()
+        user = User.query.filter_by(email=form.email.data, college_nit = form.college_nit.data).first()
         session['id'] = user.id
+        print(session['id'])
         session['full_name'] = user.full_name
 
         return redirect(url_for('home_app.index'))
