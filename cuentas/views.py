@@ -1,90 +1,193 @@
 from flask import Blueprint, session, render_template, request,flash, redirect,url_for
 
 from application import db
-from cuentas.models import Clase, Grupo
-from cuentas.forms import ClaseForm, GrupoForm
+from cuentas.models import Clase, Grupo, Cuenta, Subcuenta, Auxiliar, Subauxiliar
+from cuentas.forms import ClaseForm, GrupoForm,CuentasForm, ModificarForm
 from user.models import User
+import random
 
 cuenta_app = Blueprint('cuenta_app', __name__)
 
-@cuenta_app.route('/')
+@cuenta_app.route('/plan', methods=['GET','POST'])
 def index():
-    return render_template('cuentas/index.html')
+    clases = Clase.query.with_entities(Clase.serial, Clase.descripcion, Clase.cartera, Clase.tercero, Clase.proveedor, Clase.centroCosto)
+    grupo = Grupo.query.with_entities(Grupo.serial, Grupo.descripcion, Grupo.cartera, Grupo.tercero, Grupo.proveedor, Grupo.centroCosto)
+    cuenta = Cuenta.query.with_entities(Cuenta.serial, Cuenta.descripcion, Cuenta.cartera, Cuenta.tercero, Cuenta.proveedor, Cuenta.centroCosto)
+    subcuenta = Subcuenta.query.with_entities(Subcuenta.serial, Subcuenta.descripcion, Subcuenta.cartera, Subcuenta.tercero, Subcuenta.proveedor, Subcuenta.centroCosto)
+    auxiliar = Auxiliar.query.with_entities(Auxiliar.serial, Auxiliar.descripcion, Auxiliar.cartera, Auxiliar.tercero, Auxiliar.proveedor,Auxiliar.centroCosto)
+    subauxiliar = Subauxiliar.query.with_entities(Subauxiliar.serial, Subauxiliar.descripcion, Subauxiliar.cartera, Subauxiliar.tercero, Subauxiliar.proveedor, Subauxiliar.centroCosto)
+    x = clases.union(grupo, cuenta, subcuenta, auxiliar, subauxiliar).order_by(Clase.descripcion)
+    clase = list(x)
+    clase1=[]
+    for i in clase:
+            clase1.append([str(i[0]), i[1], i[2], i[3],i[4], i[5]])
+    clase1 = sorted(clase1, key=lambda clase : clase[0]) 
+    modificar_form = ModificarForm()
+    if modificar_form.validate_on_submit():
+        serial = modificar_form.serial.data
+        print(serial)
+        descripcion = modificar_form.descripcion.data
+        cartera = modificar_form.cartera.data
+        tercero = modificar_form.tercero.data
+        proveedor = modificar_form.proveedor.data
+        costo = modificar_form.costo.data
+        if request.modificar_form.get('action1') == 'button1':
+                objeto = modificarobjeto(serial)
+                objeto.descripcion = descripcion
+                objeto.cartera = cartera
+                objeto.tercero = tercero
+                objeto.proveedor = proveedor
+                objeto.centroCosto = costo
+                db.session.commit()
+        elif request.modificar_form.get('action2') == 'button2':
+                serial = modificar_form.serial.data
+                objeto = modificarobjeto(serial)
+                print(objeto)
+                db.session.delete(objeto)
+                db.session.commit()
 
-@cuenta_app.route('/clase', methods=['GET', 'POST'])
-def clase():
-    form = ClaseForm()
 
+#     if form.validate_on_submit():
+#         serial = form.serial.data
+#         print(serial)
+#         descripcion = form.descripcion.data
+#         cartera = form.cartera.data
+#         tercero = form.tercero.data
+#         proveedor = form.proveedor.data
+#         costo = form.costo.data
+#         objeto = modificarobjeto(serial)
+#         objeto.descripcion = descripcion
+#         objeto.cartera = cartera
+#         objeto.tercero = tercero
+#         objeto.proveedor = proveedor
+#         objeto.centroCosto = costo
+#         db.session.commit()
+#         print(objeto)
+    
+    return render_template('cuentas/plan_pagos.html', clase=clase1,  cache_id=random.randrange(10000), modificar_form=ModificarForm() )
+
+@cuenta_app.route('/cuenta', methods=['GET', 'POST'])
+def cuenta():
+    form=CuentasForm()
     if form.validate_on_submit():
         serial = form.serial.data
-        descripcion = form.descripcion.data.strip()
-        if 'Cartera' in form.example.data:
+        descripcion = form.descripcion.data
+        example = form.example.data
+        objeto = adiciondeobjetos(serial, descripcion, example)
+
+        db.session.add(objeto)
+        db.session.commit()
+        flash('El objeto se agrego con exito a la base de datos')
+    return render_template('cuentas/cuentas.html', form=form)
+
+def adiciondeobjetos(serial, descripcion, example):
+        serial = list(map(int,str(serial)))
+        serial_digits = [str(digit) for digit in serial]
+        serial_clase  = int("".join(serial_digits[0]))
+        serial_grupo = int("".join(serial_digits[0:2]))
+        serial_cuenta = int("".join(serial_digits[0:4]))
+        serial_subcuenta = int("".join(serial_digits[0:6]))
+        serial_auxiliar = int("".join(serial_digits[0:8]))
+        serial_subauxiliar = int("".join(serial_digits))
+        if 'Cartera' in example:
                 cartera=True
         else:
                 cartera=False
-        if 'Tercero' in form.example.data:
+        if 'Tercero' in example:
                 tercero=True
         else:
                 tercero=False
-        if 'Proveedor' in form.example.data:
+        if 'Proveedor' in example:
                 proveedor=True
         else:
                 proveedor=False
-        if 'CentroCosto' in form.example.data:
+        if 'CentroCosto' in example:
                 centroCosto=True
         else:
                 centroCosto=False
         
-        clase = Clase(
-            serial=serial,
-            descripcion = descripcion,
-            cartera=cartera,
-            tercero=tercero,
-            proveedor=proveedor,
-            centroCosto=centroCosto
-        )
-        db.session.add(clase)
-        db.session.commit()
-    return render_template('cuentas/clase.html', form=form)
+        if len(serial) == 1:
+                
+                objeto = Clase(
+                        serial = serial_clase,
+                        descripcion = descripcion,
+                        cartera=cartera,
+                        tercero=tercero,
+                        proveedor=proveedor,
+                        centroCosto=centroCosto
+                )
+        elif len(serial) == 2:
+                clase = Clase.query.filter_by(serial = serial_clase).first()
+                objeto = Grupo(
+                        clase = clase,
+                        serial = serial_grupo,
+                        descripcion = descripcion,
+                        cartera=cartera,
+                        tercero=tercero,
+                        proveedor=proveedor,
+                        centroCosto=centroCosto
+                )
+        elif len(serial) == 4:
+                grupo = Grupo.query.filter_by(serial = serial_grupo).first()
+                objeto = Cuenta(
+                        grupo = grupo,
+                        serial = serial_cuenta,
+                        descripcion = descripcion,
+                        cartera=cartera,
+                        tercero=tercero,
+                        proveedor=proveedor,
+                        centroCosto=centroCosto
+                )
+        elif len(serial) == 6:
+                cuenta = Cuenta.query.filter_by(serial = serial_cuenta).first()
+                objeto = Subcuenta(
+                        cuenta = cuenta,
+                        serial = serial_subcuenta,
+                        descripcion = descripcion,
+                        cartera=cartera,
+                        tercero=tercero,
+                        proveedor=proveedor,
+                        centroCosto=centroCosto
+                )
+        elif len(serial) == 8:
+                subcuenta = Subcuenta.query.filter_by(serial = serial_subcuenta).first()
+                objeto = Auxiliar(
+                        subcuenta = subcuenta,
+                        serial = serial_auxiliar,
+                        descripcion = descripcion,
+                        cartera=cartera,
+                        tercero=tercero,
+                        proveedor=proveedor,
+                        centroCosto=centroCosto
+                )
+        elif len(serial) == 10:
+                auxiliar = Auxiliar.query.filter_by(serial = serial_auxiliar).first()
+                objeto = Subauxiliar(
+                        auxiliar = auxiliar,
+                        serial = serial_subauxiliar,
+                        descripcion = descripcion,
+                        cartera=cartera,
+                        tercero=tercero,
+                        proveedor=proveedor,
+                        centroCosto=centroCosto
+                )
+        
+        return objeto
 
-@cuenta_app.route('/grupo', methods=['GET', 'POST'])
-def grupo():
-    form = GrupoForm()
+def modificarobjeto(serial):
+        if len(str(serial)) == 1:
+                objeto = Clase.query.filter_by(serial = serial).first()
+        elif len(str(serial)) == 2:
+                objeto = Grupo.query.filter_by(serial = serial).first()
+        elif len(str(serial)) == 4:
+                objeto = Cuenta.query.filter_by(serial = serial).first()
+        elif len(str(serial)) == 6:
+                objeto = Subcuenta.query.filter_by(serial = serial).first()
+        elif len(str(serial)) == 8:
+                objeto = Auxiliar.query.filter_by(serial = serial).first()
+        elif len(str(serial)) == 10:
+                objeto = Subauxiliar.query.filter_by(serial = serial).first()
 
-    if form.validate_on_submit():
-        serial_cuenta=form.serial_cuenta.data
-        clase = Clase.query.filter_by(serial=serial_cuenta).first()
-        if clase is not None:
-            serial = form.serial.data
-            descripcion = form.descripcion.data.strip()
-            if 'Cartera' in form.example.data:
-                    cartera=True
-            else:
-                    cartera=False
-            if 'Tercero' in form.example.data:
-                    tercero=True
-            else:
-                    tercero=False
-            if 'Proveedor' in form.example.data:
-                    proveedor=True
-            else:
-                    proveedor=False
-            if 'CentroCosto' in form.example.data:
-                    centroCosto=True
-            else:
-                    centroCosto=False
-            
-            grupo = Grupo(
-                clase = clase,
-                serial=serial,
-                descripcion = descripcion,
-                cartera=cartera,
-                tercero=tercero,
-                proveedor=proveedor,
-                centroCosto=centroCosto
-            )
-            db.session.add(grupo)
-            db.session.commit()
-        else:
-            flash('La clase a la que intenta agregar no se encuentra creada.')
-    return render_template('cuentas/grupo.html', form=form)
+        return objeto
+        
+        

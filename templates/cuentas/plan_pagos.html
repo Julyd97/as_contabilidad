@@ -1,0 +1,42 @@
+{% extends "home/index.html" %} 
+
+{% block plan_pagos %} 
+    
+    <table id="position" class="table table-bordered table-responsive-md table-striped text-center">
+        <tr>
+            <th scope="col">Serial</th>
+            <th scope="col">Descripción</th>
+            <th scope="col">Cartera</th>
+            <th scope="col">Tercero</th>
+            <th scope="col">Proveedor</th>
+            <th scope="col">C.Costo</th>
+        </tr>
+    {% for i in clase %} 
+        <tr data-bs-serial="{{ i[0] }}" data-bs-descripcion="{{ i[1] }}" data-bs-cartera="{{ i[2] }}" data-bs-tercero="{{ i[3] }}" data-bs-proveedor="{{ i[4] }}" data-bs-costo="{{ i[5] }}">
+            <th scope="col">{{ i[0] }}</th>
+            <th scope="col">{{ i[1] }}</th>
+            <th scope="col">
+                {% if  i[2]  == True %}
+                    <span>+</span>
+                {% endif %}
+            </th>
+            <th scope="col">
+                {% if  i[3]  == True %}
+                    <span>+</span>
+                {% endif %}
+            </th>
+            <th scope="col">
+                {% if  i[4]  == True %}
+                    <span>+</span>
+                {% endif %}
+            </th>
+            <th scope="col">
+                {% if  i[5]  == True %}
+                    <span>+</span>
+                {% endif %}
+            </th>
+        </tr>
+    {% endfor %}
+    </table>
+{% endblock %}
+{% block script %}<script src="{{ url_for('static',filename='js/script.js') }}?{{ cache_id }}"></script>{% endblock %}

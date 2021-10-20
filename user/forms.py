@@ -36,7 +36,7 @@ class LoginForm(FlaskForm):
 class RegisterForm(FlaskForm):
 
     full_name = StringField('Nombre Completo', [validators.InputRequired()], render_kw={"placeholder": "Alberto tovar"})
-    telephone = IntegerField('Telefono', [validators.InputRequired()],  render_kw={"placeholder": "365478"})
+    telephone = IntegerField('Telefono', [validators.InputRequired(), validators.NumberRange(min=3000000000)],  render_kw={"placeholder": "365478"})
     email = EmailField('Correo Electronico', [validators.InputRequired(), validators.Email()],  render_kw={"placeholder": "myemail@example.com"})
     password = PasswordField('Nueva contraseña',[validators.InputRequired(),validators.Length(min=4, max=80)],  render_kw={"placeholder": "Contraseña"})
     confirm = PasswordField('Repetir contraseña', [validators.EqualTo('password', message='Passwords must match'),],  render_kw={"placeholder": "Repita contraseña"})
