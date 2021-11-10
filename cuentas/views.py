@@ -1,4 +1,5 @@
 from flask import Blueprint, session, render_template, request,flash, redirect,url_for
+from flask.helpers import get_flashed_messages
 
 from application import db
 from cuentas.models import Clase, Grupo, Cuenta, Subcuenta, Auxiliar, Subauxiliar
@@ -8,8 +9,10 @@ import random
 
 cuenta_app = Blueprint('cuenta_app', __name__)
 
-@cuenta_app.route('/plan', methods=['GET','POST'])
+@cuenta_app.route('/plan', methods=['GET','POST','DELETE'])
 def index():
+        # Cargar los datos en tabla de Cartera
+    get_flashed_messages()
     clases = Clase.query.with_entities(Clase.serial, Clase.descripcion, Clase.cartera, Clase.tercero, Clase.proveedor, Clase.centroCosto)
     grupo = Grupo.query.with_entities(Grupo.serial, Grupo.descripcion, Grupo.cartera, Grupo.tercero, Grupo.proveedor, Grupo.centroCosto)
     cuenta = Cuenta.query.with_entities(Cuenta.serial, Cuenta.descripcion, Cuenta.cartera, Cuenta.tercero, Cuenta.proveedor, Cuenta.centroCosto)
@@ -23,7 +26,32 @@ def index():
             clase1.append([str(i[0]), i[1], i[2], i[3],i[4], i[5]])
     clase1 = sorted(clase1, key=lambda clase : clase[0]) 
     modificar_form = ModificarForm()
-    if modificar_form.validate_on_submit():
+    form=CuentasForm()
+
+    print("retornando template")
+    return render_template('cuentas/plan_pagos.html', clase=clase1,  cache_id=random.randrange(10000), modificar_form = modificar_form, form=form )
+
+@cuenta_app.route('/crearcuenta', methods=['GET','POST','DELETE'])
+def crearCuenta():
+        # Crear nuevas cuentas en cartera
+    form=CuentasForm()
+    if form.submitCrear.data:
+        print(form.submitCrear.data)
+        serial = form.serial.data
+        descripcion = form.descripcion.data
+        example = form.example.data    
+        if form.validate():
+                objeto = adiciondeobjetos(serial, descripcion, example)
+                db.session.add(objeto)
+                db.session.commit()
+                flash('El objeto se agrego con exito a la base de datos')
+    return redirect('/plan')
+
+@cuenta_app.route('/modificaryeliminarCuenta', methods=['GET', 'POST', 'DELETE'])
+def modificaryeliminarCuenta():
+        # Eliminar o modificar cuentas en cartera
+    modificar_form = ModificarForm()
+    if modificar_form.validate():
         serial = modificar_form.serial.data
         print(serial)
         descripcion = modificar_form.descripcion.data
@@ -31,7 +59,7 @@ def index():
         tercero = modificar_form.tercero.data
         proveedor = modificar_form.proveedor.data
         costo = modificar_form.costo.data
-        if request.modificar_form.get('action1') == 'button1':
+        if modificar_form.submitGuardar.data:
                 objeto = modificarobjeto(serial)
                 objeto.descripcion = descripcion
                 objeto.cartera = cartera
@@ -39,48 +67,22 @@ def index():
                 objeto.proveedor = proveedor
                 objeto.centroCosto = costo
                 db.session.commit()
-        elif request.modificar_form.get('action2') == 'button2':
+                flash('Se modifico correctamente.')
+        elif modificar_form.submitBorrar.data:
                 serial = modificar_form.serial.data
                 objeto = modificarobjeto(serial)
-                print(objeto)
-                db.session.delete(objeto)
-                db.session.commit()
-
-
-#     if form.validate_on_submit():
-#         serial = form.serial.data
-#         print(serial)
-#         descripcion = form.descripcion.data
-#         cartera = form.cartera.data
-#         tercero = form.tercero.data
-#         proveedor = form.proveedor.data
-#         costo = form.costo.data
-#         objeto = modificarobjeto(serial)
-#         objeto.descripcion = descripcion
-#         objeto.cartera = cartera
-#         objeto.tercero = tercero
-#         objeto.proveedor = proveedor
-#         objeto.centroCosto = costo
-#         db.session.commit()
-#         print(objeto)
-    
-    return render_template('cuentas/plan_pagos.html', clase=clase1,  cache_id=random.randrange(10000), modificar_form=ModificarForm() )
-
-@cuenta_app.route('/cuenta', methods=['GET', 'POST'])
-def cuenta():
-    form=CuentasForm()
-    if form.validate_on_submit():
-        serial = form.serial.data
-        descripcion = form.descripcion.data
-        example = form.example.data
-        objeto = adiciondeobjetos(serial, descripcion, example)
-
-        db.session.add(objeto)
-        db.session.commit()
-        flash('El objeto se agrego con exito a la base de datos')
-    return render_template('cuentas/cuentas.html', form=form)
+                try:
+                        db.session.delete(objeto)
+                        db.session.commit()
+                        flash('Se elimino correctamente.')
+                except:
+                        pass
+                        flash('El objeto no se pudo eliminar de forma correcta.')
+          
+        return redirect('/plan')
 
 def adiciondeobjetos(serial, descripcion, example):
+        # Adición de objetos en Cartera
         serial = list(map(int,str(serial)))
         serial_digits = [str(digit) for digit in serial]
         serial_clase  = int("".join(serial_digits[0]))
@@ -175,6 +177,7 @@ def adiciondeobjetos(serial, descripcion, example):
         return objeto
 
 def modificarobjeto(serial):
+        # BUscar el objeto con el serial para modificar o eliminarlo
         if len(str(serial)) == 1:
                 objeto = Clase.query.filter_by(serial = serial).first()
         elif len(str(serial)) == 2:

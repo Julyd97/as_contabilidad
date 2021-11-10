@@ -1,7 +1,8 @@
+from flask import flash
 from flask_wtf import FlaskForm
-from wtforms import BooleanField, validators,ValidationError, StringField, PasswordField, widgets, SelectMultipleField, IntegerField
+from wtforms import SubmitField, BooleanField, validators,ValidationError, StringField, PasswordField, widgets, SelectMultipleField, IntegerField
 
-from cuentas.models import Clase, Grupo, Cuenta, Subcuenta, Auxiliar
+from cuentas.models import Clase, Grupo, Cuenta, Subauxiliar, Subcuenta, Auxiliar
 
 
 class MultiCheckboxField(SelectMultipleField):
@@ -49,6 +50,7 @@ class CuentasForm(FlaskForm):
     list_of_files = string_of_files[0].split()
     files  = [(x,x) for x in list_of_files]
     example  = MultiCheckboxField('Parametros', choices = files)
+    submitCrear = SubmitField('Crear')
     
     def validate(self):
         rv=FlaskForm.validate(self)
@@ -69,7 +71,7 @@ class CuentasForm(FlaskForm):
                             serial_cuenta = int("".join(serial_digits[0:4]))
                             cuenta = Cuenta.query.filter_by(serial=serial_cuenta).first()
                             if cuenta is not None:
-                                if(len(serial) > len(str(serial_clase))):
+                                if(len(serial) > len(str(serial_cuenta))):
                                     serial_subcuenta = int("".join(serial_digits[0:6]))
                                     subcuenta = Subcuenta.query.filter_by(serial=serial_subcuenta).first()
                                     if subcuenta is not None:
@@ -81,51 +83,49 @@ class CuentasForm(FlaskForm):
                                                     serial_subauxiliar = int("".join(serial_digits))
                                                     subauxiliar = Subauxiliar.query.filter_by(serial = serial_subauxiliar).first()
                                                     if subauxiliar is not None:
-                                                        self.serial.errors.append('La clase que intenta crear, ya se encuentra en uso')
+                                                        flash('La clase que intenta crear, ya se encuentra en uso')
                                                         return False
                                                     else:
                                                         return True
                                                 else:
-                                                    self.serial.errors.append('La clase que intenta crear, ya se encuentra en uso')
+                                                    flash('La clase que intenta crear, ya se encuentra en uso')
                                             elif (len(serial) > len(str(serial_auxiliar))):
-                                                self.serial.errors.append( 'El objeto intenta crear, no tiene un auxiliar creado.')
+                                                flash( 'El objeto intenta crear, no tiene un auxiliar creado.')
                                                 return False
                                             else:
                                                 return True
                                         else:
-                                            self.serial.errors.append('La clase que intenta crear, ya se encuentra en uso')
+                                            flash('La clase que intenta crear, ya se encuentra en uso')
                                             return False
                                     elif(len(serial) > len(str(serial_subcuenta))):
-                                        self.serial.errors.append( 'El objeto intenta crear, no tiene una subcuenta creada.')
+                                        flash( 'El objeto intenta crear, no tiene una subcuenta creada.')
                                         return False
                                     else:
                                         return True
                                 else:
-                                    self.serial.errors.append('La clase que intenta crear, ya se encuentra en uso')
+                                    flash('La clase que intenta crear, ya se encuentra en uso')
                                     return False
                             elif(len(serial) > len(str(serial_cuenta))):
-                                print(serial)
-                                print(serial_cuenta)
-                                self.serial.errors.append( 'El objeto intenta crear, no tiene una cuenta creada.')
+                                flash( 'El objeto intenta crear, no tiene una cuenta creada.')
                                 return False
                             else:
                                 return True
                         else:
-                            self.serial.errors.append('La clase que intenta crear es invalida')
+                            flash('La clase que intenta crear es invalida')
                             return False
                     else:
-                        self.serial.errors.append('La clase que intenta crear, ya esta sen uso')
+                        flash('La clase que intenta crear, ya esta sen uso')
                         return False
                 elif (len(serial) > len(str(serial_grupo))):                                
-                    self.serial.errors.append('El objeto que intenta crear, no tiene un grupo creado.')
+                    flash('El objeto que intenta crear, no tiene un grupo creado.')
                     return False
                 else:
                     return True
             else:
-                self.serial.errors.append('La clase que intenta crear, ya se encuentra en uso')
+                flash('La clase que intenta crear, ya se encuentra en uso')
                 return False
         elif (len(serial) > len(str(serial_clase))):
-            self.serial.errors.append('El objeto que intenta crear, no tiene una clase creada.')
+            flash('El objeto que intenta crear, no tiene una clase creada.')
             return False
         else:
             return True
@@ -137,3 +137,8 @@ class ModificarForm(FlaskForm):
     tercero = BooleanField('Tercero')
     proveedor = BooleanField('Proveedor')
     costo = BooleanField('C.Costo')
+    submitGuardar = SubmitField('Guardar')
+    submitBorrar = SubmitField('Borrar')
+
+    def __repr__(self):
+        return str(self.serial)

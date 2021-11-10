@@ -15,6 +15,7 @@
 
 </head>
 <body>
+  {% include '_flashmessages.html' %}
   <div class="d-flex bd-highlight">
       <div class="p-2 flex-grow-1 bd-highlight">
           <ul class="nav nav-tabs" id="myTab" role="tablist">
@@ -30,7 +31,38 @@
           </ul>
         <div class="tab-content" id="myTabContent">
           <div class="tab-pane fade show active" id="cartera" role="tabpanel" aria-labelledby="cartera-tab" >
-            
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalnuevacuenta">
+              Crear
+            </button>
+            <div class="modal fade" id="modalnuevacuenta" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Nueva Cuenta</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+
+                      {% from "_formhelpers.html" import render_field %}
+
+                      <form method="POST" action="{{ url_for('.crearCuenta') }}" enctype="multipart/form-data" role="form">
+                          {{ form.hidden_tag() }}
+
+                          {{ render_field(form.serial, class='form-control')}}
+                          {{ render_field(form.descripcion, class='form-control')}}
+                          {{ render_field(form.example, class='form-checkbox')}}
+                          
+                        <div class="modal-footer">
+                          {{ render_field(form.submitCrear, False, class='btn btn-primary')}}
+                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
+                      </form>
+                  </div>
+                  
+                  
+                </div>
+              </div>
+            </div>
             {% block plan_pagos %}{% endblock %}
 
             <div class="modal fade" id="modal1" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
@@ -42,7 +74,7 @@
                   </div>
                   <div class="modal-body"> 
                     {% from "_formhelpers.html" import render_field %}
-                    <form method="POST" action="{{ url_for('.index') }}" role="form">
+                    <form method="POST" action="{{ url_for('.modificaryeliminarCuenta') }}" role="form">
                       {{ modificar_form.hidden_tag() }}
                       <div class="mb-3">
                         {{ render_field(modificar_form.serial, class='form-control', id='serial-text', readonly=true) }}
@@ -68,9 +100,9 @@
                       </div>
                       
                       <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary" value="button1" name="action1" >Guardar</button>
-                        <button type="submit" class="btn btn-danger" value="button2" name="action2" >Borrar</button>
                         <button type="button" id='buttonmodify' class="btn btn-warning">Modificar</button>
+                        {{ render_field(modificar_form.submitGuardar, False, class='btn btn-primary' )}}
+                        {{ render_field(modificar_form.submitBorrar, False, class='btn btn-danger' )}}
                         <button type="button" id="buttonclose" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
                         
                       </div>
@@ -87,24 +119,96 @@
           <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">...</div>
           <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">
             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalnewproveedor">
-              Proveedores
+              Crear
             </button>
+            <button type="button" id="buttonbuscar" class="btn btn-warning">Buscar</button>
+            <input type="text" id="textbuscar" placeholder="Numero de cedula" style="display: none ;">
+            <table id="proveedores" class="table table-bordered table-responsive-md table-striped text-center"></table>
             <div class="modal fade" id="modalnewproveedor" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
               <div class="modal-dialog">
                 <div class="modal-content">
                   <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Proveedor</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Nuevo Proveedor</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                   </div>
-                  <div class="modal-body">
-                    <button type="button" class="btn btn-primary">Crear Nuevo</button>
-                    <button type="button" id="buttonbuscar" class="btn btn-warning">Buscar</button>
-                    <input type="text" id="textbuscar" placeholder="Numero de cedula" style="display: none ;">
-                  </div>
-                  <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Save changes</button>
-                  </div>
+                  <form>
+                    <div class="modal-body">
+                    
+                      <div class="row container">
+                        <div class="col-6 mb-3">
+                          <label for="primerNombre" class="form-label">Primer Nombre</label>
+                          <input type="text" class="form-control" id="primerNombre" >
+                        </div>
+                        <div class="col-6 mb-3">
+                          <label for="segundoNombre" class="form-label">Segundo Nombre</label>
+                          <input type="text" class="form-control" id="segundoNombre" >
+                        </div>
+                      </div>
+                      <div class="row container">
+                        <div class="col-6 mb-3">
+                          <label for="primerApellido" class="form-label">Primer Apellido</label>
+                          <input type="text" class="form-control" id="primerApellido" >
+                        </div>
+                        <div class="col-6 mb-3">
+                          <label for="segundoApellido" class="form-label">Segundo Apellido</label>
+                          <input type="text" class="form-control" id="segundoApellido" >
+                        </div>
+                      </div>
+                      <div class="row container">
+                        <div class="col-3 mb-3">
+                          <label for="tipoDocumento" class="form-label">Tipo Doc:</label>
+                          <select id="tipoDocumento" class="form-select">
+                            <option selected>C.C</option>
+                            <option>C.E</option>
+                            <option>NIT</option>
+                            <option>D.E</option>
+                          </select>
+                        </div>
+                        <div class="col-4 mb-3">
+                          <label for="numDocumento" class="form-label">N° Documento:</label>
+                          <input type="number" class="form-control" id="numDocumento" >
+                        </div>
+                        <div class="col-5 mb-3">
+                          <label for="correo" class="form-label">Correo</label>
+                          <input type="email" class="form-control" id="correo" >
+                        </div>
+                      </div>
+                      <div class="row container">
+                        <div class="col-4 mb-3">
+                          <label for="pais" class="form-label">Pais</label>
+                          <input type="text" class="form-control" id="pais" >
+                        </div>
+                        <div class="col-4 mb-3">
+                          <label for="departamento" class="form-label">Departamento</label>
+                          <input type="text" class="form-control" id="departamento" >
+                        </div>
+                        <div class="col-4 mb-3">
+                          <label for="municipio" class="form-label">Municipio</label>
+                          <input type="text" class="form-control" id="municipio" >
+                        </div>
+                      </div>
+                      <div class="row container">
+                        <div class="col-8 mb-3">
+                          <label for="direccion" class="form-label">Dirección</label>
+                          <input type="text" class="form-control" id="direccion" >
+                        </div>
+                        <div class="col-4 mb-3">
+                          <label for="codigoPostal" class="form-label">Codigo Postal</label>
+                          <input type="number" class="form-control" id="codigoPostal" >
+                        </div>
+                      </div>
+                      <div class="row container">
+                        <div class="col-12 mb-3">
+                          <label for="telefono" class="form-label">Telefono</label>
+                          <input type="number" class="form-control" id="telefono" >
+                        </div>
+                      </div>
+                    </div>
+                    <div class="modal-footer">
+                      <button id="enviarproveedor" type="button" class="btn btn-primary">Enviar</button>
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    </div>
+                  </form>
                 </div>
               </div>
             </div>

@@ -115,3 +115,113 @@ buttonbuscar.addEventListener('click', function(){
   }
   
 })
+
+// api url
+const api_url =
+	"/api/v1.0/proveedores/";
+
+function sendapi(url,data){
+  
+  fetch(url, {
+    method: 'POST', // or 'PUT'
+    body: JSON.stringify(data), // data can be `string` or {object}!
+    headers:{
+      'Content-Type': 'application/json'
+    }
+  }).then(response => response.json())
+  .then(data => {
+    alert("Proveedor creado");
+    
+  })
+  
+
+}
+// Defining async function
+async function getapi(url) {
+	
+	// Storing response
+	const response = await fetch(url);
+	
+	// Storing data in form of JSON
+	var data = await response.json();
+	console.log(data);
+	// if (response) {
+	// 	hideloader();
+	// }
+	show(data);
+}
+// Calling that async function
+getapi(api_url);
+
+// Function to hide the loader
+// function hideloader() {
+// 	document.getElementById('loading').style.display = 'none';
+// }
+// Function to define innerHTML for HTML table
+function send(data){
+  sendapi(api_url, data);
+}
+let buttonEnviar = document.getElementById('enviarproveedor')
+buttonEnviar.addEventListener('click',function(){
+  let primerNombre1 = document.getElementById('primerNombre').value
+  let segundoNombre1 = document.getElementById('segundoNombre').value
+  let primerApellido1 = document.getElementById('primerApellido').value
+  let segundoApellido1 = document.getElementById('segundoApellido').value
+  let tipoDocumento1 = document.getElementById('tipoDocumento').value
+  let numDocumento1 = document.getElementById('numDocumento').value
+  let correo1 = document.getElementById('correo').value
+  let pais1 = document.getElementById('pais').value
+  let departamento1 = document.getElementById('departamento').value
+  let municipio1 = document.getElementById('municipio').value
+  let direccion1 = document.getElementById('direccion').value
+  let codigoPostal1 = document.getElementById('codigoPostal').value
+  let telefono1 = document.getElementById('telefono').value
+
+  let data = {primerNombre: primerNombre1, segundoNombre: segundoNombre1, primerApellido: primerApellido1, 
+              segundoApellido: segundoApellido1, tipoDocumento: tipoDocumento1, numDocumento: numDocumento1,
+              correo: correo1, pais:pais1, departamento: departamento1, municipio:municipio1, direccion:direccion1, codigoPostal:codigoPostal1, telefono:telefono1 }
+  
+  send(data);
+  
+})
+function show(data) {
+	let tab =
+		`<tr>
+		<th>Pais</th>
+		<th>Codigo Postal</th>
+		<th>Primer Nombre</th>
+		<th>Segundo Nombre</th>
+		<th>Primer Apellido</th>
+    <th>Segundo Apellido</th>
+    <th>Departamento</th>
+    <th>Telefono</th>
+    <th>Correo</th>
+    <th>Municipio</th>
+    <th>Tipo de Documento</th>
+    <th>Numero de Documento</th>
+    <th>Dirección</th>
+    </tr>`;
+	
+	// Loop to access all rows
+	for (let r of data) {
+		tab += `<tr>
+	<td>${r.pais} </td>
+	<td>${r.codigoPostal}</td>
+	<td>${r.primerNombre}</td>
+	<td>${r.segundoNombre}</td>
+  <td>${r.primerApellido}</td>
+  <td>${r.segundoApellido}</td>
+  <td>${r.departamento}</td>
+  <td>${r.telefono}</td>
+  <td>${r.correo}</td>
+  <td>${r.municipio}</td>
+  <td>${r.tipoDocumento}</td>
+  <td>${r.numDocumento}</td>
+  <td>${r.direccion}</td>		
+</tr>`;
+	}
+	// Setting innerHTML as tab variable
+	document.getElementById("proveedores").innerHTML = tab;
+}
+
+
