@@ -59,6 +59,7 @@ def modificaryeliminarCuenta():
         tercero = modificar_form.tercero.data
         proveedor = modificar_form.proveedor.data
         costo = modificar_form.costo.data
+        print(descripcion)
         if modificar_form.submitGuardar.data:
                 objeto = modificarobjeto(serial)
                 objeto.descripcion = descripcion

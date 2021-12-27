@@ -26,7 +26,7 @@
                 <button class="nav-link active" id="cartera-tab" data-bs-toggle="tab" data-bs-target="#cartera" type="button" role="tab" aria-controls="cartera" aria-selected="true">Cartera</button>
               </li>
               <li class="nav-item" role="presentation">
-                <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="false">Profile</button>
+                <button class="nav-link" id="documentoscontables-tab" data-bs-toggle="tab" data-bs-target="#documentoscontables" type="button" role="tab" aria-controls="documentoscontables" aria-selected="false">Documentos Contables</button>
               </li>
               <li class="nav-item" role="presentation">
                 <button class="nav-link" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact" type="button" role="tab" aria-controls="contact" aria-selected="false">Proveedores</button>
@@ -49,9 +49,6 @@
         </nav>
         <div class="tab-content" id="myTabContent">
           <div class="tab-pane fade show active" id="cartera" role="tabpanel" aria-labelledby="cartera-tab" >
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalnuevacuenta">
-              Crear
-            </button>
             <div class="modal fade" id="modalnuevacuenta" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
               <div class="modal-dialog">
                 <div class="modal-content">
@@ -81,7 +78,12 @@
                 </div>
               </div>
             </div>
-            {% block plan_pagos %}{% endblock %}
+            <div class="container">
+              <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalnuevacuenta">
+                Crear
+              </button>
+              {% block plan_pagos %}{% endblock %}
+            </div>
 
             <div class="modal fade" id="modal1" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
               <div class="modal-dialog modal-lg">
@@ -134,14 +136,108 @@
 
 
           </div>
-          <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">...</div>
+          <div class="tab-pane fade" id="documentoscontables" role="tabpanel" aria-labelledby="documentoscontables-tab">
+            <div class="container ">
+              <button type="button" class="col-1 btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalnewdocumentocontable">
+                Crear
+              </button>
+              <div class="row">
+                <table id="tabladocumentoscontables" class="col-2 table table-bordered table-responsive-md table-striped text-center "></table>
+              </div>
+            </div>
+            <div class="modal fade" id="modalnewdocumentocontable" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="ModalDocumentoContableCrearTitle">Nuevo Documento Contable</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <form>
+                    <div class="modal-body">
+                    
+                      <div class="row container">
+                        <div class="col-6 mb-3">
+                          <label for="fechanuevodocumento" class="form-label">Fecha</label>
+                          <input type="date" class="form-control" id="fechanuevodocumento" >
+                        </div>
+                        <div class="col-6 mb-3">
+                          <label for="prefijonuevodocumento" class="form-label">Prefijo</label>
+                          <input type="text" class="form-control" id="prefijonuevodocumento" maxlength="5" >
+                        </div>
+                      </div>
+                      <div class="row container">
+                        <div class="col-3 mb-3">
+                          <label for="consecutivonuevodocumento" class="form-label">Consecutivo</label>
+                          <input type="number" class="form-control" id="consecutivonuevodocumento" >
+                        </div>
+                        <div class="col-9 mb-3">
+                          <label for="descripcionnuevodocumento" class="form-label">Descripción</label>
+                          <input type="text" class="form-control" id="descripcionnuevodocumento" >
+                        </div>
+                      </div>
+                    </div>
+                    <div class="modal-footer">
+                      <button id="enviarnuevodocumento" type="button" class="btn btn-primary" data-bs-dismiss="modal">Enviar</button>
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+            <div class="modal fade" id="modalmodifydocumentocontable" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="ModalDocumentoContableModifyTitle">Documento Contable</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <form>
+                    <div class="modal-body">
+                    
+                      <div class="row container">
+                        <div class="col-6 mb-3">
+                          <label for="fechadocumentom" class="form-label">Fecha</label>
+                          <input type="date" class="form-control" id="fechadocumentom" disabled >
+                        </div>
+                        <div class="col-6 mb-3">
+                          <label for="prefijodocumentom" class="form-label">Prefijo</label>
+                          <input type="text" class="form-control" id="prefijodocumentom" disabled>
+                        </div>
+                      </div>
+                      <div class="row container">
+                        <div class="col-3 mb-3">
+                          <label for="consecutivodocumentom" class="form-label">Consecutivo</label>
+                          <input type="number" class="form-control" id="consecutivodocumentom" disabled>
+                        </div>
+                        <div class="col-9 mb-3">
+                          <label for="descripciondocumentom" class="form-label">Descripción</label>
+                          <input type="text" class="form-control" id="descripciondocumentom" disabled>
+                          <input type="number" class="form-control d-none" id="iddocumentom" disabled>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="modal-footer">
+                      <button id="modificardocumentom" type="button" class="btn btn-warning">Modificar</button>
+                      <button id="guardardocumentom" type="button" class="btn btn-primary" data-bs-dismiss="modal" >Guardar</button>
+                      <button id="borrardocumento" type="button" class="btn btn-danger" data-bs-dismiss="modal">Borrar</button>
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
           <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalnewproveedor">
-              Crear
-            </button>
-            <button type="button" id="buttonbuscar" class="btn btn-warning">Buscar</button>
-            <input type="text" id="textbuscar" placeholder="Numero de cedula">
-            <table id="proveedores" class="table table-bordered table-responsive-md table-striped text-center"></table>
+            <div class="container ">
+              <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalnewproveedor">
+                Crear
+              </button>
+              <button type="button" id="buttonbuscar" class="btn btn-warning">Buscar</button>
+              <input type="text" id="textbuscar" placeholder="Numero de cedula">
+              <div class="row">
+                <table id="proveedores" class="col-10 table table-bordered table-responsive-md table-striped text-center"></table>
+              </div>
+            </div>
             <div class="modal fade" id="modalnewproveedor" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
               <div class="modal-dialog">
                 <div class="modal-content">
