@@ -1,3 +1,14 @@
+const tablacuentas = `<tr>
+<th>Codigo</th>
+<th>Descripción</th>
+<th>Cartera</th>
+<th>Tercero</th>
+<th>Proveedor</th>
+<th>C.Costo</th>
+<th class="d-none">parent_id</th>
+<th class="d-none">nivel</th>
+<th class="d-none">id</th>  
+</tr>`;
 const tablaproveedores = `<tr>
 <th>Nombre</th>
 <th>Tipo de Documento</th>
@@ -15,8 +26,11 @@ const tabladocumentos = `<tr>
 <th>Fecha</th>
 <th>Prefijo</th>
 <th>Consecutivo</th>
-<th>Descripcion</th> 
+<th>Descripcion</th>
+<th>Tipo Documento</th>
 </tr>`;
+
+
 const tbody = document.querySelectorAll('#position tr');
 
 let DOMModal = document.getElementById('modal1');
@@ -129,41 +143,51 @@ buttonclose.addEventListener('click', function(){
 })
 
 // api url
-const api_url =
+const api_url_proveedores =
 	"/api/v1.0/proveedores/";
-
-function sendapi(url,data,alerta, tabla, destino){
+const api_url_documentos =
+  "/api/v1.0/documentoscontables/";
+const api_url_cuentas =
+  "/api/v1.0/carteras/";
+function sendapi(url,data, tabla, iddestino){
   
-  fetch(url, {
+ fetch(url, {
     method: 'POST', // or 'PUT'
     body: JSON.stringify(data), // data can be `string` or {object}!
     headers:{
       'Content-Type': 'application/json'
     }
-  }).then(response => response.json())
-  .then(data => {
-    alert(alerta);
-    loadtable(url,tabla,destino)
-    loadtable(url,tabla,destino)
   })
-  
+  .then((response) => {
+    response.json().then((result)=>{
+      console.log(result.message)
+      if(response.ok){
+        loadtable(url,tabla,iddestino)
+        loadtable(url,tabla,iddestino)
+      }
+      alert(result.message)
+    })
+    
+  })
+  .catch(error => console.log(error))
 
 }
 // Defining async function
 async function getapi(url) {
 	
-	const response = await fetch(url);
+	let response = await fetch(url);
 	
   return response
 
 }
 // Calling that async function
 
-//getapi(api_url);
+//getapi(api_url_proveedores);
 
 
-loadtable(api_url,tablaproveedores,"proveedores");
-loadtable('/api/v1.0/documentoscontables/',tabladocumentos,"tabladocumentoscontables");
+loadtable(api_url_proveedores,tablaproveedores,"proveedores");
+loadtable(api_url_documentos,tabladocumentos,"tabladocumentoscontables");
+loadtable(api_url_cuentas, tablacuentas,"cuentas" );
 
 // Function to hide the loader
 // function hideloader() {
@@ -171,9 +195,6 @@ loadtable('/api/v1.0/documentoscontables/',tabladocumentos,"tabladocumentosconta
 // }
 // Function to define innerHTML for HTML table
 
-
-
-// Choose fields from proveedores table
 
 
 
@@ -189,25 +210,44 @@ function modifyinapi(url,data,alerta){
   }).then(response => response.json())
   .then(data => {
     alert(alerta);
-    loadtable(api_url,tablaproveedores,"proveedores")
+    loadtable(api_url_proveedores,tablaproveedores,"proveedores")
   })
 }
 
-function deleteapi(url){
-  fetch(url, {
+function deleteapi(urldelete,urltabla,alerta, tabla, iddestino){
+  fetch(urldelete, {
     method: 'DELETE', // or 'PUT'
     headers:{
       'Content-Type': 'application/json'
     }
   }).then(response => response.json())
   .then(data => {
-    alert("Proveedor eliminado");
-    loadtable(api_url,tablaproveedores,"proveedores")
+    alert(alerta);
+    loadtable(urltabla,tabla,iddestino)
   })
 }
 // Muestra la informacion de la api en la tabla previamente creada
 function show(data, tabladestino,id) {
 	let tab = tabladestino;
+  if(id == "cuentas"){
+      for (let r of data) {
+        if(r.cartera==true){r.cartera ='+';}else{ r.cartera ='';}
+        if(r.tercero==true){r.tercero ='+';}else{ r.tercero ='';}
+        if(r.proveedor==true){r.proveedor ='+';}else{ r.proveedor ='';}
+        if(r.centroCosto==true){r.centroCosto ='+';}else{ r.centroCosto ='';}
+        tab += `<tr>
+      <td>${r.serial}</td>
+      <td>${r.descripcion}</td>
+      <td>${r.cartera}</td>
+      <td>${r.tercero}</td>
+      <td>${r.proveedor}</td>
+      <td>${r.centroCosto}</td>
+      <td class="d-none">${r.parent_id}</td>
+      <td class="d-none">${r.nivel}</td>
+      <td class="d-none">${r.id}</td>
+    </tr>`;
+    }
+  }
   if(id == "proveedores"){
       for (let r of data) {
         tab += `<tr>
@@ -232,6 +272,7 @@ function show(data, tabladestino,id) {
       <td>${r.prefijo}</td>
       <td>${r.consecutivo}</td>
       <td>${r.descripcion}</td>
+      <td>${r.tipodocumento}</td>
       <td class="d-none">${r.id}</td>
     </tr>`;
     }
@@ -239,25 +280,84 @@ function show(data, tabladestino,id) {
 	// Setting innerHTML as tab variable
 	document.getElementById(id).innerHTML = tab;
 }
-
-//Cargar la informacion de los proveedores(api) que esta en la tabla al modal emergente 
+ 
 async function loadtable(url, tabladestino, id){
   response = await getapi(url);
-  if (response.ok == true){ 
-    var data = await response.json();
-    show(data, tabladestino,id);
-  } else{
+  if (response.ok != true){ 
     alert('El proveedor que esta buscando no se encuentra, revise la busqueda')
   }
-  if(id=="proveedores"){
+  var data = await response.json();
+  show(data, tabladestino,id);
+  if(id=="cuentas"){
+    cargarmodalcuentas()
+  }
+  if(id=="proveedores"){  
     cargarmodalproveedores()
   }
   if(id=="tabladocumentoscontables"){
     cargarmodaldocumentos()
+  } 
+}
+// Cargar la información de la tabla de cuentas al modal de modificación de cuentas
+function cargarmodalcuentas(){
+  const tbodysmodificarcuenta = document.querySelectorAll('#cuentas tr');
+
+  let DOMModalmodificarcuenta = document.getElementById('modalmodificarcuenta');
+  console.log(tbodysmodificarcuenta);
+  let modalElementsmodificarcuenta = new bootstrap.Modal(DOMModalmodificarcuenta, {
+    keyboard: false
+  });
+
+  for (var i = 1; i < tbodysmodificarcuenta.length; i++){
+    tbodysmodificarcuenta[i].addEventListener('click', function() {
+      modalElementsmodificarcuenta.show(this);
+    });
   }
-  
+  DOMModalmodificarcuenta.addEventListener('show.bs.modal', function (event) {
+    // Button that triggered the modal
+    var button = event.relatedTarget
+    // Extract info from data-bs-* attributes
+    
+    let serial = button.childNodes[1].innerHTML
+    let descripcion = button.childNodes[3].innerHTML
+    let cartera = button.childNodes[5].innerHTML
+    let tercero = button.childNodes[7].innerHTML
+    let proveedor = button.childNodes[9].innerHTML
+    let centrocosto = button.childNodes[11].innerHTML
+    let parent_id = button.childNodes[13].innerHTML
+    let nivel = button.childNodes[15].innerHTML
+    let id = button.childNodes[17].innerHTML
+    
+    // If necessary, you could initiate an AJAX request here
+    // and then do the updating in a callback.
+    //
+    // Update the modal's content.
+    let modalSerial = DOMModalmodificarcuenta.querySelector('#serialmodificarcuenta')
+    let modalDescripcion = DOMModalmodificarcuenta.querySelector('#descripcionmodificarcuenta')
+    let modalCartera = DOMModalmodificarcuenta.querySelector('#carteramodificarcuenta')
+    let modalTercero = DOMModalmodificarcuenta.querySelector('#terceromodificarcuenta')
+    let modalProveedor = DOMModalmodificarcuenta.querySelector('#proveedormodificarcuenta')
+    let modalCentroCosto = DOMModalmodificarcuenta.querySelector('#centrocostomodificarcuenta')
+    let modalId = DOMModalmodificarcuenta.querySelector("#idcuenta")
+
+    //var modalBodyInput = DOMModal.querySelector('.modal-body input')
+    modalSerial.value = serial
+    modalDescripcion.value = descripcion
+    modalCartera.checked = cartera
+    modalTercero.checked = tercero
+    modalProveedor.checked = proveedor
+    modalCentroCosto.checked = centrocosto
+    modalId.value = id
+
+    let elements = document.querySelectorAll('#modalmodificarcuenta input');
+    for(let e of elements){
+      e.disabled= true
+    }
+    //modalBodyInput.value = recipient
+  })
 }
 
+//Cargar la informacion de los proveedores(api) que esta en la tabla al modal emergente
 function cargarmodalproveedores(){
   const tbodys = document.querySelectorAll('#proveedores tr');
 
@@ -351,7 +451,8 @@ function cargarmodaldocumentos(){
     let prefijo = button.childNodes[3].innerHTML
     let consecutivo = button.childNodes[5].innerHTML
     let descripcion = button.childNodes[7].innerHTML
-    let id = button.childNodes[9].innerHTML
+    let tipodocumento = button.childNodes[9].innerHTML
+    let id = button.childNodes[11].innerHTML
     
     // If necessary, you could initiate an AJAX request here
     // and then do the updating in a callback.
@@ -361,6 +462,7 @@ function cargarmodaldocumentos(){
     let modalConsecutivo = DOMModals.querySelector('#consecutivodocumentom')
     let modalDescripcion = DOMModals.querySelector('#descripciondocumentom')
     let modalFecha = DOMModals.querySelector('#fechadocumentom')
+    let modalTipoDocumento = DOMModals.querySelector('#tipodocumentom')
     let modalid = DOMModals.querySelector('#iddocumentom')
 
     //var modalBodyInput = DOMModal.querySelector('.modal-body input')
@@ -368,11 +470,64 @@ function cargarmodaldocumentos(){
     modalConsecutivo.value = consecutivo
     modalDescripcion.value = descripcion
     modalFecha.value = fecha
+    modalTipoDocumento.value = tipodocumento
     modalid.value = id
     //modalBodyInput.value = recipient
     
   })
 }
+// Enviar la info de la cuenta a la api para crearla
+let buttonenviarcuenta = document.getElementById('enviarnuevacuenta')
+buttonenviarcuenta.addEventListener('click', function(){
+    let serial1 = document.getElementById('serialnuevacuenta').value
+    let descripcion1 = document.getElementById('descripcionnuevacuenta').value
+    if(serial1 != '' && descripcion1 != ''){
+    let cartera1 = document.getElementById('carteranuevacuenta').checked
+    let tercero1 = document.getElementById('terceronuevacuenta').checked
+    let proveedor1 = document.getElementById('proveedornuevacuenta').checked
+    let centrocosto1 = document.getElementById('centrocostonuevacuenta').checked
+    
+    let data = {serial: serial1, descripcion: descripcion1, cartera: cartera1, tercero: tercero1,
+                proveedor: proveedor1, centroCosto:centrocosto1 }
+
+    sendapi(api_url_cuentas,data,tablacuentas,'cuentas')
+
+    let all = document.querySelectorAll('#modalnewcuenta input');
+    all.forEach(function(allelements){
+      allelements.value=""
+      allelements.checked= false
+    })
+  }
+})
+// Calcular nivel y parent de cuenta
+// Boton Modificar en el modal para habilitar los campos de edicion
+let buttonmodificarcuenta = document.getElementById('modificarcuenta')
+buttonmodificarcuenta.addEventListener('click', function(){
+  let allinputs = document.querySelectorAll('#modalmodificarcuenta input');
+  allinputs.forEach(function(allelements){
+    allelements.disabled = false
+  })
+  allinputs[0].disabled = true
+}) 
+
+// Boton de guardar para guardar los datos realizados en la modificacion
+let buttonguardarcuenta = document.getElementById('guardarcuenta')
+buttonguardarcuenta.addEventListener('click', function(){
+  let descripcion1 = document.getElementById('descripcionmodificarcuenta').value
+  if(descripcion1 != ''){
+    let cartera1 = document.getElementById('carteramodificarcuenta').checked
+    let tercero1 = document.getElementById('terceromodificarcuenta').checked
+    let proveedor1 = document.getElementById('proveedormodificarcuenta').checked
+    let centrocosto1 = document.getElementById('centrocostomodificarcuenta').checked
+    let nivel1 = '2';
+    let parent_id1 = null
+    let data = {serial: serial1, parent_id: parent_id1, nivel:nivel1, descripcion: descripcion1, cartera: cartera1, tercero: tercero1,
+                proveedor: proveedor1, centroCosto:centrocosto1 }
+
+    sendapi(api_url_cuentas,data,tablacuentas,'cuentas')
+  }
+})
+
 // Enviar la info del proveedor para crearlo
 let buttonEnviar = document.getElementById('enviarproveedor')
 buttonEnviar.addEventListener('click',function(){
@@ -394,7 +549,7 @@ buttonEnviar.addEventListener('click',function(){
               segundoApellido: segundoApellido1, tipoDocumento: tipoDocumento1, numDocumento: numDocumento1,
               correo: correo1, pais:pais1, departamento: departamento1, municipio:municipio1, direccion:direccion1, codigoPostal:codigoPostal1, telefono:telefono1 }
   
-  sendapi(api_url,data,"Proveedor creado", tablaproveedores, "proveedores");
+  sendapi(api_url_proveedores,data, tablaproveedores, "proveedores");
 })
 // Boton para modificar proveedores en el modal de proveedor
 let buttonModificarProveedor = document.getElementById('modificarProveedor')
@@ -456,7 +611,7 @@ let buttonBorrarProveedor = document.getElementById('borrarProveedor')
 buttonBorrarProveedor.addEventListener('click',function(){
   let id1 = document.getElementById('idm').value
   let url = '/api/v1.0/proveedor/'.concat(id1)
-  deleteapi(url);
+  deleteapi(url,api_url_proveedores,'Proveedor Eliminado',tablaproveedores,"proveedores");
 });
 
 // Bloquea los campos del modal de proveedores cuando se cierra
@@ -518,30 +673,19 @@ buttonEnviarNuevoDocumento.addEventListener('click',function(){
   console.log(prefijo1)
   let consecutivo1 = document.getElementById('consecutivonuevodocumento').value
   let descripcion1 = document.getElementById('descripcionnuevodocumento').value
-  let fecha1 = document.getElementById('fechanuevodocumento').value
+  fecha1 = '0001-01-01'
+  let tipodocumento1 = document.getElementById('tiponuevodocumento').value
 
-  let data = {fecha: fecha1, consecutivo: consecutivo1, descripcion: descripcion1,  prefijo: prefijo1  }
+  let data = {fecha: fecha1, consecutivo: consecutivo1, descripcion: descripcion1,  prefijo: prefijo1, tipodocumento: tipodocumento1  }
   
-  sendapi('/api/v1.0/documentoscontables/',data,"Docuemnto creado",tabladocumentos,"tabladocumentoscontables");
+  sendapi('/api/v1.0/documentoscontables/',data,tabladocumentos,"tabladocumentoscontables");
 })
 
 // Modal modificar Documento contable
 
-let buttonmodificardocumento = document.getElementById('modificardocumentom')
-buttonmodificardocumento.addEventListener('click', function(){
-  let elements = document.querySelectorAll('#modalmodifydocumentocontable div.modal-body div.row.container div input');
-  for(let e of elements){
-    e.disabled= false
-  }
-})
+ 
 
-let modalmodifydocumento = document.getElementById('modalmodifydocumentocontable')
-modalmodifydocumento.addEventListener('hidden.bs.modal', function () {
-  let elements = document.querySelectorAll('#modalmodifydocumentocontable div.modal-body div.row.container div input');
-  for(let e of elements){
-    e.disabled= true
-  }
-})
+
 
 let buttonguardardocumento = document.getElementById('guardardocumentom')
 buttonguardardocumento.addEventListener('click',function(){
@@ -555,3 +699,11 @@ buttonguardardocumento.addEventListener('click',function(){
   let url= '/api/v1.0/documentoscontables/'.concat(id1)
   modifyinapi()
 })
+
+let buttonBorrarDocumento = document.getElementById('borrardocumento')
+buttonBorrarDocumento.addEventListener('click',function(){
+  let id1 = document.getElementById('iddocumentom').value
+  console.log(id1)
+  let url = '/api/v1.0/documentoscontables/'.concat(id1)
+  deleteapi(url,api_url_documentos,'Documento Eliminado',tabladocumentos,"tabladocumentoscontables");
+});

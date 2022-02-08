@@ -1,4 +1,4 @@
-"""empty message
+"""Create initial tables
 
 Revision ID: 99dc76f7f680
 Revises: 

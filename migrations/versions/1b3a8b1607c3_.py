@@ -1,4 +1,4 @@
-"""empty message
+"""Create proveedores table
 
 Revision ID: 1b3a8b1607c3
 Revises: 99dc76f7f680
@@ -22,14 +22,14 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('tipoDocumento', sa.String(length=5), nullable=True),
     sa.Column('numDocumento', sa.BigInteger(), nullable=True),
-    sa.Column('pais', sa.String(length=20), nullable=True),
-    sa.Column('departamento', sa.String(length=20), nullable=True),
-    sa.Column('municipio', sa.String(length=20), nullable=True),
-    sa.Column('primerNombre', sa.String(length=10), nullable=True),
-    sa.Column('segundoNombre', sa.String(length=10), nullable=True),
-    sa.Column('primerApellido', sa.String(length=10), nullable=True),
-    sa.Column('segundoApellido', sa.String(length=10), nullable=True),
-    sa.Column('direccion', sa.String(length=30), nullable=True),
+    sa.Column('pais', sa.String(length=40), nullable=True),
+    sa.Column('departamento', sa.String(length=40), nullable=True),
+    sa.Column('municipio', sa.String(length=40), nullable=True),
+    sa.Column('primerNombre', sa.String(length=15), nullable=True),
+    sa.Column('segundoNombre', sa.String(length=15), nullable=True),
+    sa.Column('primerApellido', sa.String(length=15), nullable=True),
+    sa.Column('segundoApellido', sa.String(length=15), nullable=True),
+    sa.Column('direccion', sa.String(length=130), nullable=True),
     sa.Column('telefono', sa.BigInteger(), nullable=True),
     sa.Column('correo', sa.String(length=120), nullable=True),
     sa.Column('codigoPostal', sa.Integer(), nullable=True),

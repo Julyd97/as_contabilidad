@@ -44,6 +44,7 @@ def create_app(** config_overrides):
     from user.views import user_app
     from home.views import home_app
     from cuentas.views import cuenta_app
+    from cartera.api import cartera_app
     from proveedores.api import proveedores_app
     from documentoscontables.api import documentoscontables_app
     # register blueprints
@@ -51,6 +52,7 @@ def create_app(** config_overrides):
     app.register_blueprint(user_app)
     app.register_blueprint(home_app)
     app.register_blueprint(cuenta_app)
+    app.register_blueprint(cartera_app)
     app.register_blueprint(proveedores_app)
     app.register_blueprint(documentoscontables_app)
     return app

@@ -23,11 +23,13 @@ class DocumentosContablesListResource(Resource):
         return result, 201
     def post(self):
         data = request.get_json()
+        print(data)
         documentoscontables_dict = documentoscontables_schema.load(data)
         documentos = DocumentosContables(fecha = documentoscontables_dict['fecha'],
                                         descripcion = documentoscontables_dict['descripcion'],
                                         consecutivo = documentoscontables_dict['consecutivo'],
-                                        prefijo = documentoscontables_dict['prefijo']
+                                        prefijo = documentoscontables_dict['prefijo'],
+                                        tipodocumento = documentoscontables_dict['tipodocumento']
         )  
         documentos.save()
         resp = documentoscontables_schema.dump(documentos)
@@ -53,6 +55,7 @@ class DocumentosContablesResource(Resource):
             documento.descripcion = documento_dict['descripcion']
             documento.consecutivo = documento_dict['consecutivo']
             documento.prefijo = documento_dict['prefijo']
+            documento.tipodocumento = documento_dict['tipodocumento']
             
             
             documento.save()

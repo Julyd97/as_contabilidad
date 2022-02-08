@@ -7,3 +7,4 @@ class DocumentosContablesSchema(ma.Schema):
     descripcion = fields.String()
     consecutivo = fields.Integer()
     prefijo = fields.String()
+    tipodocumento = fields.String()

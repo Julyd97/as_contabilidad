@@ -1,3 +1,4 @@
+from cgi import print_directory
 from flask import request, Blueprint
 from flask_restful import Api, Resource
 
@@ -16,31 +17,34 @@ class ProveedorListResource(Resource):
             result = proveedor_schema.dump(proveedores, many=True)
         else:  
             proveedores = Proveedor.query.filter(Proveedor.numDocumento.like(str(num_cedula) + '%')).all()
+            result = proveedor_schema.dump(proveedores, many=True)
             if proveedores == []:
-                return  {'message': 'Ocurrio un error buscando con el numero dado'}, 404
-            else:         
-                result = proveedor_schema.dump(proveedores, many=True)
-        print(proveedores)
+                return  result, 404
         return result, 201
     def post(self):
         data = request.get_json()
         proveedor_dict = proveedor_schema.load(data)
-        proveedor = Proveedor(tipoDocumento = proveedor_dict['tipoDocumento'],
-                                numDocumento = proveedor_dict['numDocumento'],
-                                pais = proveedor_dict['pais'], departamento = proveedor_dict['departamento'],
-                                municipio = proveedor_dict['municipio'],
-                                primerNombre = proveedor_dict['primerNombre'],
-                                segundoNombre = proveedor_dict['segundoNombre'],
-                                primerApellido = proveedor_dict['primerApellido'],
-                                segundoApellido = proveedor_dict['segundoApellido'],
-                                direccion = proveedor_dict['direccion'],
-                                telefono = proveedor_dict['telefono'],
-                                correo = proveedor_dict['correo'],
-                                codigoPostal = proveedor_dict['codigoPostal']
-        )  
-        proveedor.save()
-        resp = proveedor_schema.dump(proveedor)
-        return resp, 201
+        num_documento = proveedor_dict['numDocumento']
+        proveedor_actual= Proveedor.query.filter_by(numDocumento = num_documento).first()
+        if(proveedor_actual != None):
+            return {'message': 'El proveedor que intenta crear ya esta creado.'}
+        else:
+            proveedor = Proveedor(tipoDocumento = proveedor_dict['tipoDocumento'],
+                                    numDocumento = proveedor_dict['numDocumento'],
+                                    pais = proveedor_dict['pais'], departamento = proveedor_dict['departamento'],
+                                    municipio = proveedor_dict['municipio'],
+                                    primerNombre = proveedor_dict['primerNombre'],
+                                    segundoNombre = proveedor_dict['segundoNombre'],
+                                    primerApellido = proveedor_dict['primerApellido'],
+                                    segundoApellido = proveedor_dict['segundoApellido'],
+                                    direccion = proveedor_dict['direccion'],
+                                    telefono = proveedor_dict['telefono'],
+                                    correo = proveedor_dict['correo'],
+                                    codigoPostal = proveedor_dict['codigoPostal']
+            )  
+            proveedor.save()
+            resp = proveedor_schema.dump(proveedor)
+            return {'message':'El proveedor se creo con exito'}, 201
     
     
         
