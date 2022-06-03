@@ -1,0 +1,73 @@
+#modalnewcuenta{
+    top: 10%;
+}
+#modalmodificarcuenta{
+    top: 10%;
+}
+#modalnewproveedor{
+    top: 5%;
+}
+#modalModifyProveedor{
+    top: 5%;
+}
+#alert_placeholder{
+    position: fixed;
+    top: 0;
+    z-index: 1056;
+    width: 100%;
+}
+.badge-notification {
+    position: absolute;
+    left: 1.4rem;
+    top: 0rem;
+    font-size: 0.7rem;
+}
+.bi{
+    font-size: 1.2rem;
+}
+.nav-item .nav-link{
+ color: black;   
+}
+.nav-pills .active{
+    background-color: black !important   ;
+}
+#navsettings{
+    background-color: white;
+    position: fixed;
+    width: 100%;
+}
+#myTabContent{
+    padding-top: 4rem;
+}
+.inputsformulario{
+    height: 100%;
+    width: 100%;
+}
+.divselect{
+    height: 550px !important; 
+    overflow: auto !important;
+}
+#tableregistrodocumentos{
+    font-size: x-small;
+    table-layout: fixed;
+}
+#tableregistrodocumentos input, 
+#tableregistrodocumentos select{
+    height: 100%;
+    width: 100%;
+    border: 0px;
+}
+#modalnuevoregistrodocumentos .modal-footer .row{
+width: 100%;
+}
+#tableregistrodocumentos tbody tr th{
+    overflow: hidden
+}
+#tableregistrodocumentos tbody tr th div{
+    max-height: 16px
+}
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}

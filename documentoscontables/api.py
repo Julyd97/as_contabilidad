@@ -17,13 +17,12 @@ class DocumentosContablesListResource(Resource):
         else:  
             proveedores = DocumentosContables.query.filter(DocumentosContables.numDocumento.like(str(num_cedula) + '%')).all()
             if proveedores == []:
-                return  {'message': 'Ocurrio un error buscando con el numero dado'}, 404
+                return  {'message': 'El documento buscado no existe','alerta':'alert-danger','icon':'#exclamation-triangle-fill'}, 404
             else:         
                 result = documentoscontables_schema.dump(proveedores, many=True)
         return result, 201
     def post(self):
         data = request.get_json()
-        print(data)
         documentoscontables_dict = documentoscontables_schema.load(data)
         documentos = DocumentosContables(fecha = documentoscontables_dict['fecha'],
                                         descripcion = documentoscontables_dict['descripcion'],
@@ -33,24 +32,25 @@ class DocumentosContablesListResource(Resource):
         )  
         documentos.save()
         resp = documentoscontables_schema.dump(documentos)
-        return resp, 201
+        return {'message':'El documento se creo exitosamente','alerta':'alert-success','icon':'#check-circle-fill'}, 201
     
     
         
 class DocumentosContablesResource(Resource):
     def get(self, documento_id):
-        proveedor = DocumentosContables.get_by_id(documento_id)
-        if proveedor is None:
-            raise ('El proveedor no existe')
-        resp = documentoscontables_schema.dump(proveedor)
-        return resp
-    def put(self, proveedor_id):
-        documento = DocumentosContables.get_by_id(proveedor_id)
+        documento = DocumentosContables.get_by_id(documento_id)
         if documento is None:
-            raise ('El proveedor no existe')
+            return  {'message': 'El documento buscado no existe','alerta':'alert-danger','icon':'#exclamation-triangle-fill'}, 404
+        resp = documentoscontables_schema.dump(documento)
+        return resp
+    def put(self, documento_id):
+        documento = DocumentosContables.get_by_id(documento_id)
         data = request.get_json()
+        if documento is None:
+            return  {'message': 'El documento buscado no existe','alerta':'alert-danger','icon':'#exclamation-triangle-fill'}, 404
         try:
             documento_dict = documentoscontables_schema.load(data)
+            print(documento_dict)
             documento.fecha = documento_dict['fecha']
             documento.descripcion = documento_dict['descripcion']
             documento.consecutivo = documento_dict['consecutivo']
@@ -60,18 +60,18 @@ class DocumentosContablesResource(Resource):
             
             documento.save()
             resp = documentoscontables_schema.dump(documento)
-            return resp, 201
+            return {'message':'El documento se modifico exitosamente','alerta':'alert-success','icon':'#check-circle-fill'}, 201
         except:
-            return {'message': 'Ocurrio un error modificando el proveedor'}, 400
+            return {'message': 'Ocurrio un error modificando el proveedor','alerta':'alert-warning','icon':'#exclamation-triangle-fill'}, 400
     def  delete(self, documento_id):
         documento = DocumentosContables.get_by_id(documento_id)
         if documento is None:
-            raise ('El proveedor no existe')
+            return  {'message': 'El documento buscado no existe','alerta':'alert-danger','icon':'#exclamation-triangle-fill'}, 404
         try:
             documento.delete()
-            return 201
+            return {'message':'El documento se elimino exitosamente','alerta':'alert-success','icon':'#check-circle-fill'}, 201
         except:
-            return {'message': 'Un error ocurrio un error eliminando el proveedor'}, 400
+            return {'message': 'Un error ocurrio un error eliminando el proveedor','alerta':'alert-danger','icon':'#exclamation-triangle-fill'}, 400
 
 api.add_resource(DocumentosContablesListResource, '/api/v1.0/documentoscontables/', endpoint='documentoscontables_list_resource')
-api.add_resource(DocumentosContablesResource, '/api/v1.0/documentoscontables/<int:documento_id>', endpoint='documentoscontables_resource')
+api.add_resource(DocumentosContablesResource, '/api/v1.0/documentocontable/<int:documento_id>', endpoint='documentoscontables_resource')

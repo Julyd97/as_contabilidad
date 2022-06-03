@@ -13,6 +13,6 @@ class ProveedorSchema(ma.Schema):
     primerApellido = fields.String()
     segundoApellido = fields.String()
     direccion = fields.String()
-    telefono = fields.Integer()
+    telefono = fields.Integer(allow_none = True)
     correo = fields.String()
-    codigoPostal = fields.Integer()
+    codigoPostal = fields.Integer(allow_none = True)
