@@ -8,13 +8,15 @@ class DocumentosContables(db.Model, BaseModelMixin):
     consecutivo= db.Column(db.Integer())
     prefijo = db.Column(db.String(5))
     tipodocumento = db.Column(db.String(15))
+    plantilla = db.Column(db.String(15))
     
-    def __init__(self, fecha, descripcion, consecutivo, prefijo, tipodocumento):
+    def __init__(self, fecha, descripcion, consecutivo, prefijo, tipodocumento, plantilla):
         self.fecha = fecha
         self.descripcion = descripcion
         self.consecutivo = consecutivo
         self.prefijo = prefijo
         self.tipodocumento = tipodocumento
+        self.plantilla = plantilla
 
     def __repr__(self):
         return f'Documento({self.descripcion})'

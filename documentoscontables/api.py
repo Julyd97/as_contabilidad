@@ -28,7 +28,8 @@ class DocumentosContablesListResource(Resource):
                                         descripcion = documentoscontables_dict['descripcion'],
                                         consecutivo = documentoscontables_dict['consecutivo'],
                                         prefijo = documentoscontables_dict['prefijo'],
-                                        tipodocumento = documentoscontables_dict['tipodocumento']
+                                        tipodocumento = documentoscontables_dict['tipodocumento'],
+                                        plantilla = documentoscontables_dict['plantilla']
         )  
         documentos.save()
         resp = documentoscontables_schema.dump(documentos)

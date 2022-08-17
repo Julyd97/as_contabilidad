@@ -11,3 +11,5 @@ class CarteraSchema(ma.Schema):
     tercero = fields.Boolean()
     proveedor = fields.Boolean()
     centroCosto = fields.Boolean()
+    naturaleza = fields.Boolean()
+    tipo =  fields.String()

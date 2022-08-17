@@ -8,3 +8,4 @@ class DocumentosContablesSchema(ma.Schema):
     consecutivo = fields.Integer()
     prefijo = fields.String()
     tipodocumento = fields.String()
+    plantilla = fields.String()

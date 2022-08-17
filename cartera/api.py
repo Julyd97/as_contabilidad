@@ -59,7 +59,9 @@ class CarteraListResource(Resource):
                                 cartera = cuenta_dict['cartera'],
                                 tercero = cuenta_dict['tercero'],
                                 proveedor = cuenta_dict['proveedor'],
-                                centroCosto = cuenta_dict['centroCosto']
+                                centroCosto = cuenta_dict['centroCosto'],
+                                naturaleza = cuenta_dict['naturaleza'],
+                                tipo = cuenta_dict['tipo']
                         )  
             cuenta.save()
             resp = cartera_schema.dump(cuenta)

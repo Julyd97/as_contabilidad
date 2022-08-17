@@ -40,7 +40,13 @@ const tablaselectcuentas =  `<tr>
 <th>Codigo</th>
 <th>Descripcion</th>
 </tr>`;
-
+function stringtonumber(numero){
+  let cambio = parseFloat(numero.replace(/[^0-9\.]+/g,''),10)
+  if(numero == ''){
+    cambio = 0
+  }
+  return cambio
+}
 function showalert(message, alerttype, icon) {
   let alerta = document.getElementById('alert_placeholder')
   alerta.innerHTML = `<div id="alertdiv" class="alert alert-dismissible fade show  ${alerttype}" role="alert"> <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" ><use xlink:href="${icon}"/></svg>
@@ -531,7 +537,19 @@ function cargarmodaldocumentos() {
     //modalBodyInput.value = recipient
 
   })
-}
+}// Activar el campo tipo dependiendo de la cuenta
+let serialcuenta = document.getElementById('serialnuevacuenta')
+serialcuenta.addEventListener('change', function(){
+  let tipocuenta = document.getElementById('tipocuenta')
+  let label = document.getElementById('labeltipocuenta')
+  if(serialcuenta.value.length == 1){
+    tipocuenta.style.display = 'block'
+    label.style.display = 'block'
+  }else{
+    tipocuenta.style.display = 'none'
+    label.style.display = 'none'
+  }
+})
 // Enviar la info de la cuenta a la api para crearla
 let buttonenviarcuenta = document.getElementById('enviarcuentaform')
 buttonenviarcuenta.addEventListener('submit', async function (event) {
@@ -541,10 +559,17 @@ buttonenviarcuenta.addEventListener('submit', async function (event) {
   let tercero1 = document.getElementById('terceronuevacuenta').checked
   let proveedor1 = document.getElementById('proveedornuevacuenta').checked
   let centrocosto1 = document.getElementById('centrocostonuevacuenta').checked
+  let naturaleza1 = 0;
+  if(document.getElementById('radiodebito').checked) {
+    naturaleza1 = 0;
+  }else if(document.getElementById('radiocredito').checked) {
+    naturaleza1 = 1;
+  }
+  let tipocuenta1 = document.getElementById('tipocuenta').value
 
   let data = {
     serial: serial1, descripcion: descripcion1, cartera: cartera1, tercero: tercero1,
-    proveedor: proveedor1, centroCosto: centrocosto1
+    proveedor: proveedor1, centroCosto: centrocosto1, naturaleza: naturaleza1, tipo: tipocuenta1 
   }
   event.preventDefault();
   let ok = await sendapi(api_url_cuentas, data, tablacuentas, 'cuentas')
@@ -812,13 +837,13 @@ document.querySelector('#textbuscarcuentaform').addEventListener('keypress', fun
 let buttonEnviarNuevoDocumento = document.getElementById('enviarnuevodocumento')
 buttonEnviarNuevoDocumento.addEventListener('click', function () {
   let prefijo1 = document.getElementById('prefijonuevodocumento').value
-  console.log(prefijo1)
   let consecutivo1 = document.getElementById('consecutivonuevodocumento').value
   let descripcion1 = document.getElementById('descripcionnuevodocumento').value
   fecha1 = '0001-01-01'
   let tipodocumento1 = document.getElementById('tiponuevodocumento').value
-
-  let data = { fecha: fecha1, consecutivo: consecutivo1, descripcion: descripcion1, prefijo: prefijo1, tipodocumento: tipodocumento1 }
+  let plantilla1 = document.getElementById('plantillanuevodocumento').value
+  console.log(plantilla1)
+  let data = { fecha: fecha1, consecutivo: consecutivo1, descripcion: descripcion1, prefijo: prefijo1, tipodocumento: tipodocumento1, plantilla: plantilla1 }
 
   sendapi('/api/v1.0/documentoscontables/', data, tabladocumentos, "tabladocumentoscontables");
 })
@@ -922,6 +947,7 @@ const tbodyselectproveedores = document.querySelectorAll('#tableselectproveedore
 for(var i = 1; i < tbodyselectproveedores.length; i++){
   tbodyselectproveedores[i].addEventListener('dblclick', function(){
       let proveedorseleccionado = document.getElementById(id)
+      let inputtercero = document.getElementById('inputtercero')
       let DOMModalnuevoregistro = document.getElementById('modalnuevoregistrodocumentos')
       let DOMModalModal2 = document.getElementById('myModal2')
       let modalbackdrop2 = document.getElementsByClassName('modal-backdrop')
@@ -935,8 +961,15 @@ for(var i = 1; i < tbodyselectproveedores.length; i++){
       modalElementsModal2._hideModal()
       modalbackdrop2[0].remove()
       modalElementsnuevoregistro.show()
-      nombreproveedor = this.childNodes[1].innerHTML
+      nombreproveedor = this.children[0].innerHTML
+      idproveedor = this.children[3].innerHTML
+      id = document.createAttribute('id_proveedor')
+      id.value = idproveedor
+      proveedorseleccionado.setAttributeNode(id)
       proveedorseleccionado.value= nombreproveedor
+      if(id == 'proveedorseleccionado'){
+        inputtercero.value = nombreproveedor
+      }
     })
   }
 }
@@ -958,8 +991,12 @@ function selecttablacuentas(id){
         modalElementsModal2._hideModal()
         modalbackdrop2[0].remove()
         modalElementsnuevoregistro.show()
-        codigocuenta = this.childNodes[1].innerHTML
-        cuentaseleccionada.value= codigocuenta
+        codigocuenta = this.children[0].innerHTML
+        idcuenta = this.children[2].innerHTML
+        id = document.createAttribute('id_cuenta')
+        id.value = idcuenta
+        cuentaseleccionada.setAttributeNode(id)
+        cuentaseleccionada.value= codigocuenta 
       })
     }
   }
@@ -977,7 +1014,6 @@ function formatopeso(numero){
   });
   
   let number = parseFloat(numero.replace(/[^0-9\.]+/g,''),10)
-  console.log(number)
   let a = formatocolombia.format(number)
   if (a=='$NaN'){
     a='0'
@@ -997,7 +1033,7 @@ inputvalortotal.addEventListener('change',function(){
 let porcentajevalor = document.getElementById('porcentajevalor')
 porcentajevalor.addEventListener('change',function(){
   let numero = document.getElementById('inputvalorbase').value
-  numero = parseFloat(numero.replace(/[^0-9\.]+/g,''),10)
+  numero = stringtonumber(numero)
   porcentaje = parseFloat(this.value)/100
   let valortotal = document.getElementById('inputvalortotal')
   let valorfinal = Math.round(numero*porcentaje)
@@ -1009,24 +1045,26 @@ function llenartablaregistro(e){
   e.preventDefault();
   let tbodydocuments = document.querySelector('#tableregistrodocumentos tbody')
   let cuenta = document.getElementById('inputcuenta').value
+  let idcuenta = document.getElementById('inputcuenta').getAttribute('id_cuenta')
   let descripcion = document.getElementById('inputdescripcion').value
   let proveedor = document.getElementById('inputtercero').value
+  let id_proveedor = document.getElementById('inputtercero').getAttribute('id_proveedor')
   let debitocredito = document.getElementById('debitocredito').value
   let valorbase = document.getElementById('inputvalorbase').value
   let porcentaje = document.getElementById('porcentajevalor').value
   let valortotal = document.getElementById('inputvalortotal').value
   let tr = document.createElement("tr")
   tr.innerHTML= `
-  <th>${cuenta}</th>
+  <th id_cuenta='${idcuenta}'>${cuenta}</th>
   <th>${descripcion}</th>
-  <th>${proveedor}</th>
+  <th id_proveedor = '${id_proveedor}'>${proveedor}</th>
   <th>${debitocredito}</th>
   <th>${valorbase}</th>
   <th>${porcentaje}</th>
   <th>${valortotal}</th>
   <th></th>
   <th></th>
-  <th><button class ="btn-delete btn-danger btn">-</button></th>`;
+  <th><button class ="btn-delete btn-danger btn" onclick="deleterow(this)">-</button></th>`;
   tbodydocuments.appendChild(tr);
 }
 // Traer valores debitos o creditos y sumarlos
@@ -1037,13 +1075,109 @@ function sumarvalores(){
   let valor = document.getElementById('inputvalortotal')
   tipo = tipo.value
   if(tipo == 'debito'){
-    debitos.value += valor.value
+    
+    let numerodebito = stringtonumber(valor.value) + stringtonumber(debitos.value)
+    debitos.value = formatopeso(numerodebito.toString())
   }
   else{
-    creditos.value += valor.value
+    let numerocredito = stringtonumber(valor.value) + stringtonumber(creditos.value)
+    creditos.value = formatopeso(numerocredito.toString())
   }
 
-  console.log(valor.value)
 }
 formregistro.addEventListener('click', llenartablaregistro);
 formregistro.addEventListener('click',sumarvalores)
+// document.getElementById('debitocredito').options[document.getElementById('debitocredito').selectedIndex].text
+function deleterow(event){
+  // event.target will be the input element.
+  let debitos = document.getElementById('sumadebitosregistro')
+  let creditos = document.getElementById('sumacreditosregistro')
+  let td = event.parentNode; 
+  let tr = td.parentNode; // the row to be removed
+  let tipo = tr.childNodes[7].innerHTML
+  let valor = tr.childNodes[13].innerHTML
+  if(tipo == 'debito'){
+    
+    let numerodebito = stringtonumber(debitos.value) - stringtonumber(valor) 
+    debitos.value = formatopeso(numerodebito.toString())
+  }
+  else{
+    let numerocredito = stringtonumber(creditos.value) - stringtonumber(valor.value) 
+    creditos.value = formatopeso(numerocredito.toString())
+  }
+  tr.parentNode.removeChild(tr);
+}
+async function createasientos(){
+  let tablaregistro = document.getElementById('tableregistrodocumentos');
+  let tbody = tablaregistro.children[1].children;
+  let asientos = Array.from(tbody);
+  let contador = 0;
+  let data = []
+  for (let index = 1; index < asientos.length; index++) {
+    datos = asientos[index].children;
+    // let asien = new Asiento(datos[0].getAttribute('id_cuenta'), datos[1].innerHTML, datos[2].getAttribute('id_proveedor'), datos[3].innerHTML, datos[4].innerHTML, datos[5].innerHTML, datos[6].innerHTML, datos[7].innerHTML, datos[8].innerHTML)
+    let asien = new Asiento('27', 'gdhasgdh', '37', '0', '5454', '454', '454', '454', '5615')
+    data.push(asien)
+  }
+  console.log(data)
+  console.log(data[0])
+  let a = await fetch('/api/v1.0/asientos/', {
+    method: 'POST', // or 'PUT'
+    body: JSON.stringify(data), // data can be `string` or {object}!
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  })
+}
+async function createregistros(){
+  
+  let tipodocumento = document.getElementById('selecttipodocumento')
+  let consecutivo = document.getElementById('tipoconsecutivo')
+  let fecha = document.getElementById('tipofecha')
+  let proveedor = document.getElementById('proveedorseleccionado')
+  let observaciones = document.getElementById('observacionesregistro')
+  let regis = new Registro(tipodocumento.value, consecutivo.value, fecha.value, proveedor.getAttribute('id_proveedor'), observaciones.value)
+  let data = regis
+  let id_registro;
+  let a = await fetch('/api/v1.0/registros/', {
+    method: 'POST', // or 'PUT'
+    body: JSON.stringify(data), // data can be `string` or {object}!
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  }).then((response) => {
+    response.json().then((result) => {
+      // alert(result.message)
+      showalert(result.message, result.alerta,result.icon)
+      console.log(result.id)
+      id_registro=result.id
+      return result.id
+    })
+    
+    
+  })
+  console.log(id_registro)
+}
+class Registro{
+  constructor(documentocontable, consecutivo, fecha, proveedor, observaciones){
+    this.id_documentocontable = documentocontable;
+    this.consecutivo = consecutivo;
+    this.fecha = fecha;
+    this.id_proveedor = proveedor;
+    this.observaciones = observaciones;
+  }
+}
+class Asiento {
+  constructor(cuenta, descripcion, tercero, debitocredito, valorbase, porcentaje, valortotal, formadepago, ccosto) {
+    this.id_registro = '3';
+    this.id_cuenta = cuenta;
+    this.descripcion = descripcion;
+    this.id_proveedor = tercero;
+    this.debitocredito = debitocredito;
+    this.valorbase = valorbase;
+    this.porcentaje = porcentaje;
+    this.valortotal = valortotal;
+    this.id_formapago = formadepago;
+    this.id_centrocosto = ccosto;
+  }
+}
