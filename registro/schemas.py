@@ -4,7 +4,7 @@ from application import ma
 
 class RegistroSchema(ma.Schema):
     id = fields.Integer(dump_only = True)
-    D = fields.Integer()
+    id_documentocontable = fields.Integer()
     consecutivo = fields.Integer()
     fecha = fields.Date()
     id_proveedor = fields.Integer()

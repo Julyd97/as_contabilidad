@@ -33,8 +33,13 @@ class RegistroListResource(Resource):
         return result, 201
     def post(self):
         data = request.get_json()
-        registro_dict = registro_schema.load(data)
+        print(data)
+        print(data[0])
+        data_registro = data[0]
+        data_asientos = data[1:]
+        registro_dict = registro_schema.load(data_registro)
         consecutivo_registro = registro_dict['consecutivo']
+        fecha_registro = registro_dict['fecha']
         id_documentocontable = registro_dict['id_documentocontable']
         id_proveedor = registro_dict['id_proveedor']
         documentoscontables = documentoscontables_schema.dump(DocumentosContables.get_by_id(id_documentocontable))
@@ -45,21 +50,54 @@ class RegistroListResource(Resource):
         if(registro_actual != None):
             return {'message':'La cuenta que intenta crear ya esta creada.','alerta': 'alert-danger','icon':'#exclamation-triangle-fill'}, 404
         else:
-            registro = Registro(
-                                documentocontable = documentoscontables,
-                                consecutivo = registro_dict['consecutivo'],
-                                fecha = registro_dict['fecha'],
-                                proveedor = proveedores,
-                                observaciones = registro_dict['observaciones'],
-                        )  
-            registro.save()
-            stmt=(update(DocumentosContables).where(DocumentosContables.id == id_documentocontable).values(consecutivo = consecutivo_registro))
-            print(registro.id)
-            print(stmt)
-            print(id_documentocontable)
-            print(consecutivo_registro  )
-            resp = registro_schema.dump(registro)
-            return {'message':'El registro se creo exitosamente','alerta':'alert-success','icon':'#check-circle-fill', 'id': registro.id}, 201
+            try:   
+                registro = Registro(
+                                    documentocontable = documentoscontables,
+                                    consecutivo = registro_dict['consecutivo'],
+                                    fecha = registro_dict['fecha'],
+                                    proveedor = proveedores,
+                                    observaciones = registro_dict['observaciones'],
+                            )  
+                doc=DocumentosContables.get_by_id(id_documentocontable)
+                doc.consecutivo = consecutivo_registro
+                doc.fecha = fecha_registro
+                
+                registro.save()
+                doc.save()
+        
+                for asientodata in data_asientos:
+                    asiento_dict = asiento_schema.load(asientodata)
+                    id_registro = registro.id
+                    id_cuenta = asiento_dict['id_cuenta']
+                    id_proveedor = asiento_dict['id_proveedor']
+                    registros = registro_schema.dump(Registro.get_by_id(id_registro))
+                    cuentas = cartera_schema.dump(Cartera.get_by_id(id_cuenta))
+                    proveedores = proveedor_schema.dump(Proveedor.get_by_id(id_proveedor))
+
+                    asiento = Asiento(
+                                        registro = registros,
+                                        cuenta = cuentas,
+                                        descripcion = asiento_dict['descripcion'],
+                                        proveedor = proveedores,
+                                        debitocredito = asiento_dict['debitocredito'],
+                                        valorbase = asiento_dict['valorbase'],
+                                        porcentaje = asiento_dict['porcentaje'],
+                                        valortotal = asiento_dict['valortotal'],
+                                        id_formapago = asiento_dict['id_formapago'],
+                                        id_centrocosto = asiento_dict['id_centrocosto']
+                                )  
+                    asiento.save()
+                print(registro.id) 
+                print(id_documentocontable)
+                print(doc) 
+                resp = registro_schema.dump(registro)
+                return {'message':'El registro se creo exitosamente','alerta':'alert-success','icon':'#check-circle-fill'}, 201
+            except:
+                # stmt=(update(DocumentosContables).where(DocumentosContables.id == id_documentocontable).values(consecutivo = consecutivo_registro))
+                # print(registro.id)
+                # print(stmt)
+                
+                return {'message':'Fallo la creacion del registro','alerta': 'alert-danger','icon':'#exclamation-triangle-fill'}, 404
     
     
         

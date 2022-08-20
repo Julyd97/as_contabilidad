@@ -1020,6 +1020,10 @@ function formatopeso(numero){
   }
   return a
 }
+function pesoanumero(peso){
+  let number = parseFloat(peso.replace(/[^0-9\.]+/g,''),10)
+  return number
+}
 let inputvalorbase = document.getElementById('inputvalorbase')
 inputvalorbase.addEventListener('change',function(){
   
@@ -1112,7 +1116,8 @@ async function createasientos(){
   let tbody = tablaregistro.children[1].children;
   let asientos = Array.from(tbody);
   let contador = 0;
-  let data = []
+  let data =[]
+  
   for (let index = 1; index < asientos.length; index++) {
     datos = asientos[index].children;
     // let asien = new Asiento(datos[0].getAttribute('id_cuenta'), datos[1].innerHTML, datos[2].getAttribute('id_proveedor'), datos[3].innerHTML, datos[4].innerHTML, datos[5].innerHTML, datos[6].innerHTML, datos[7].innerHTML, datos[8].innerHTML)
@@ -1136,8 +1141,23 @@ async function createregistros(){
   let fecha = document.getElementById('tipofecha')
   let proveedor = document.getElementById('proveedorseleccionado')
   let observaciones = document.getElementById('observacionesregistro')
+  let data =[];
   let regis = new Registro(tipodocumento.value, consecutivo.value, fecha.value, proveedor.getAttribute('id_proveedor'), observaciones.value)
-  let data = regis
+
+  data.push(regis)
+  let tablaregistro = document.getElementById('tableregistrodocumentos');
+  let tbody = tablaregistro.children[1].children;
+  let asientos = Array.from(tbody);
+  let contador = 0;
+  
+  for (let index = 1; index < asientos.length; index++) {
+    datos = asientos[index].children;
+    let asien = new Asiento(datos[0].getAttribute('id_cuenta'), datos[1].innerHTML, datos[2].getAttribute('id_proveedor'), datos[3].innerHTML, datos[4].innerHTML, datos[5].innerHTML, datos[6].innerHTML, datos[7].innerHTML, datos[8].innerHTML)
+    // let asien = new Asiento('27', 'gdhasgdh', '37', '0', '5454', '454', '454', '454', '5615')
+    data.push(asien)
+  }
+  console.log(data)
+  let  = regis
   let id_registro;
   let a = await fetch('/api/v1.0/registros/', {
     method: 'POST', // or 'PUT'
@@ -1169,7 +1189,6 @@ class Registro{
 }
 class Asiento {
   constructor(cuenta, descripcion, tercero, debitocredito, valorbase, porcentaje, valortotal, formadepago, ccosto) {
-    this.id_registro = '3';
     this.id_cuenta = cuenta;
     this.descripcion = descripcion;
     this.id_proveedor = tercero;
