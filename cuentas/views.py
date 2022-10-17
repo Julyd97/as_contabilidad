@@ -5,11 +5,13 @@ from application import db
 from cuentas.models import Clase, Grupo, Cuenta, Subcuenta, Auxiliar, Subauxiliar
 from cuentas.forms import ClaseForm, GrupoForm,CuentasForm, ModificarForm
 from user.models import User
+from user.views import login_required
 import random
 
 cuenta_app = Blueprint('cuenta_app', __name__)
 
 @cuenta_app.route('/plan', methods=['GET','POST','DELETE'])
+@login_required
 def index():
         # Cargar los datos en tabla de Cartera
     get_flashed_messages()
@@ -29,7 +31,7 @@ def index():
     form=CuentasForm()
 
     print("retornando template")
-    return render_template('cuentas/plan_pagos.html', clase=clase1,  cache_id=random.randrange(10000), modificar_form = modificar_form, form=form )
+    return render_template('home/index.html', clase=clase1,  cache_id=random.randrange(10000), modificar_form = modificar_form, form=form )
 
 @cuenta_app.route('/crearcuenta', methods=['GET','POST','DELETE'])
 def crearCuenta():

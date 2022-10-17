@@ -832,21 +832,30 @@ document.querySelector('#textbuscarcuentaform').addEventListener('keypress', fun
   }
 });
 
-
 // Modal Crear Documento Contable
-let buttonEnviarNuevoDocumento = document.getElementById('enviarnuevodocumento')
-buttonEnviarNuevoDocumento.addEventListener('click', function () {
+let buttonenviardocumento = document.getElementById('enviardocumentoform')
+buttonenviardocumento.addEventListener('submit', async function(event){
   let prefijo1 = document.getElementById('prefijonuevodocumento').value
   let consecutivo1 = document.getElementById('consecutivonuevodocumento').value
   let descripcion1 = document.getElementById('descripcionnuevodocumento').value
   fecha1 = '0001-01-01'
   let tipodocumento1 = document.getElementById('tiponuevodocumento').value
   let plantilla1 = document.getElementById('plantillanuevodocumento').value
-  console.log(plantilla1)
-  let data = { fecha: fecha1, consecutivo: consecutivo1, descripcion: descripcion1, prefijo: prefijo1, tipodocumento: tipodocumento1, plantilla: plantilla1 }
 
-  sendapi('/api/v1.0/documentoscontables/', data, tabladocumentos, "tabladocumentoscontables");
+  let data = { fecha: fecha1, consecutivo: consecutivo1, descripcion: descripcion1, prefijo: prefijo1, tipodocumento: tipodocumento1, plantilla: plantilla1 }
+  event.preventDefault()
+
+  let ok = await  sendapi('/api/v1.0/documentoscontables/', data, tabladocumentos, "tabladocumentoscontables");
+  if(ok == true){
+  let all = document.querySelectorAll('#modalnewdocumentocontable input');
+  all.forEach(function (allelements) {
+    allelements.value = ""
+  })
+  }
+
 })
+
+
 //Modificar Documento contable
 let buttonmodificardocumento = document.getElementById('modificardocumentom')
 buttonmodificardocumento.addEventListener('click',function(){
@@ -886,14 +895,14 @@ modalmodificardocumentocontable.addEventListener('hidden.bs.modal', function(){
   })
 })
 let buttonnuevoregistro = document.getElementById('buttonregistrodocumento')
-buttonnuevoregistro.addEventListener('click', async function(){
+buttonnuevoregistro.addEventListener('click', cargardocumentos )
+async function cargardocumentos(){
   let selecttipodocumento = document.getElementById('selecttipodocumento')
   selecttipodocumento.innerHTML=''
   var optempty = document.createElement('option')
   selecttipodocumento.appendChild(optempty)
   response = await getapi(api_url_documentos)
   documentosarray = await response.json()
-  console.log(documentosarray)
   for(var i = 0; i < documentosarray.length;i++){
     var opt = document.createElement('option')
     opt.value = documentosarray[i]['id']
@@ -906,7 +915,7 @@ buttonnuevoregistro.addEventListener('click', async function(){
     opt.innerHTML = `${documentosarray[i]['descripcion']}      ${documentosarray[i]['prefijo']}`
     selecttipodocumento.appendChild(opt)
   }
-})
+}
 let selecttipodocumento = document.getElementById('selecttipodocumento')
 selecttipodocumento.addEventListener('click', function(){
   let inputfecha =  document.getElementById('tipofecha')
@@ -1035,7 +1044,7 @@ inputvalortotal.addEventListener('change',function(){
   this.value = formatopeso(this.value)
 })
 let porcentajevalor = document.getElementById('porcentajevalor')
-porcentajevalor.addEventListener('change',function(){
+porcentajevalor.addEventListener('keyup',function(){
   let numero = document.getElementById('inputvalorbase').value
   numero = stringtonumber(numero)
   porcentaje = parseFloat(this.value)/100
@@ -1068,7 +1077,7 @@ function llenartablaregistro(e){
   <th>${valortotal}</th>
   <th></th>
   <th></th>
-  <th><button class ="btn-delete btn-danger btn" onclick="deleterow(this)">-</button></th>`;
+  <th><button type="button" class ="btn-delete btn-danger btn" onclick="deleterow(this)">-</button></th>`;
   tbodydocuments.appendChild(tr);
 }
 // Traer valores debitos o creditos y sumarlos
@@ -1106,7 +1115,7 @@ function deleterow(event){
     debitos.value = formatopeso(numerodebito.toString())
   }
   else{
-    let numerocredito = stringtonumber(creditos.value) - stringtonumber(valor.value) 
+    let numerocredito = stringtonumber(creditos.value) - stringtonumber(valor) 
     creditos.value = formatopeso(numerocredito.toString())
   }
   tr.parentNode.removeChild(tr);
@@ -1134,49 +1143,16 @@ async function createasientos(){
     }
   })
 }
-async function createregistros(){
-  
-  let tipodocumento = document.getElementById('selecttipodocumento')
-  let consecutivo = document.getElementById('tipoconsecutivo')
-  let fecha = document.getElementById('tipofecha')
-  let proveedor = document.getElementById('proveedorseleccionado')
-  let observaciones = document.getElementById('observacionesregistro')
-  let data =[];
-  let regis = new Registro(tipodocumento.value, consecutivo.value, fecha.value, proveedor.getAttribute('id_proveedor'), observaciones.value)
-
-  data.push(regis)
-  let tablaregistro = document.getElementById('tableregistrodocumentos');
-  let tbody = tablaregistro.children[1].children;
-  let asientos = Array.from(tbody);
-  let contador = 0;
-  
-  for (let index = 1; index < asientos.length; index++) {
-    datos = asientos[index].children;
-    let asien = new Asiento(datos[0].getAttribute('id_cuenta'), datos[1].innerHTML, datos[2].getAttribute('id_proveedor'), datos[3].innerHTML, datos[4].innerHTML, datos[5].innerHTML, datos[6].innerHTML, datos[7].innerHTML, datos[8].innerHTML)
-    // let asien = new Asiento('27', 'gdhasgdh', '37', '0', '5454', '454', '454', '454', '5615')
-    data.push(asien)
+function pasarabinario(dyc){
+  if(dyc == 'debito'){
+    return '1'
   }
-  console.log(data)
-  let  = regis
-  let id_registro;
-  let a = await fetch('/api/v1.0/registros/', {
-    method: 'POST', // or 'PUT'
-    body: JSON.stringify(data), // data can be `string` or {object}!
-    headers: {
-      'Content-Type': 'application/json'
-    }
-  }).then((response) => {
-    response.json().then((result) => {
-      // alert(result.message)
-      showalert(result.message, result.alerta,result.icon)
-      console.log(result.id)
-      id_registro=result.id
-      return result.id
-    })
-    
-    
-  })
-  console.log(id_registro)
+  else if(dyc == 'credito'){
+    return '0'
+  }
+  else{
+    return 'error'
+  }
 }
 class Registro{
   constructor(documentocontable, consecutivo, fecha, proveedor, observaciones){
@@ -1192,11 +1168,70 @@ class Asiento {
     this.id_cuenta = cuenta;
     this.descripcion = descripcion;
     this.id_proveedor = tercero;
-    this.debitocredito = debitocredito;
+    this.debitocredito = pasarabinario(debitocredito);
     this.valorbase = valorbase;
     this.porcentaje = porcentaje;
     this.valortotal = valortotal;
-    this.id_formapago = formadepago;
-    this.id_centrocosto = ccosto;
+    this.id_formapago = null //formadepago;
+    this.id_centrocosto = null // ccosto;
   }
 }
+let enviarregistroform = document.getElementById('enviarregistroform')
+enviarregistroform.addEventListener('submit', async function(event){
+  event.preventDefault();
+  let debitos = document.getElementById('sumadebitosregistro')
+  let creditos = document.getElementById('sumacreditosregistro')
+  let tipodocumento = document.getElementById('selecttipodocumento')
+  let consecutivo = document.getElementById('tipoconsecutivo')
+  let fecha = document.getElementById('tipofecha')
+  let proveedor = document.getElementById('proveedorseleccionado')
+  let observaciones = document.getElementById('observacionesregistro')
+  let data =[];
+  let regis = new Registro(tipodocumento.value, consecutivo.value, fecha.value, proveedor.getAttribute('id_proveedor'), observaciones.value)
+
+  
+  let tablaregistro = document.getElementById('tableregistrodocumentos');
+  let tbody = tablaregistro.children[1].children;
+  let asientos = Array.from(tbody);
+  let contador = 0;
+  if(asientos.length < 3){
+    showalert('No se han agregado los asientos suficientes','alert-danger','#exclamation-triangle-fill')
+    return 'fallo'
+  }
+  else if(debitos.value == '' || creditos.value == ''){
+    showalert('No se han agregado los asientos correctamente','alert-danger','#exclamation-triangle-fill')
+    return 'fallo'
+  }
+  for (let index = 1; index < asientos.length; index++) {
+    datos = asientos[index].children;
+    let asien = new Asiento(datos[0].getAttribute('id_cuenta'), datos[1].innerHTML, datos[2].getAttribute('id_proveedor'), datos[3].innerHTML, stringtonumber(datos[4].innerHTML), datos[5].innerHTML, stringtonumber(datos[6].innerHTML), datos[7].innerHTML, datos[8].innerHTML)
+    data.push(asien)
+  }
+  regis.asiento = data
+  console.log(regis)
+  let a = await fetch('/api/v1.0/registros/', {
+    method: 'POST', // or 'PUT'
+    body: JSON.stringify(regis), // data can be `string` or {object}!
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  }).then((response) => {
+    response.json().then((result) => {
+      // alert(result.message)
+      showalert(result.message, result.alerta,result.icon)
+      loadtable(api_url_documentos, tabladocumentos, "tabladocumentoscontables")
+    })
+  })
+})
+let borrarregistroform = document.getElementById('borrarregistroform')
+borrarregistroform.addEventListener('click',function(){
+cargardocumentos()
+let filas = document.querySelectorAll('#tableregistrodocumentos tr')
+for(var i = 2; i < filas.length ; i++){
+  filas[i].remove()
+}
+let all = document.querySelectorAll('#modalnuevoregistrodocumentos input');
+  all.forEach(function (allelements) {
+    allelements.value = ""
+  })
+})

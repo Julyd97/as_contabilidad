@@ -1,5 +1,6 @@
 from contextlib import nullcontext
 from email.policy import default
+from operator import truediv
 from application import db, BaseModelMixin
 from cartera.models import Cartera
 from cuentas.models import Cuenta
@@ -41,8 +42,8 @@ class Asiento(db.Model, BaseModelMixin):
     valorbase = db.Column(db.Float())
     porcentaje = db.Column(db.Float())
     valortotal = db.Column(db.Float())
-    id_formapago = db.Column(db.Integer())
-    id_centrocosto = db.Column(db.Integer())
+    id_formapago = db.Column(db.Integer(), nullable = True)
+    id_centrocosto = db.Column(db.Integer(), nullable = True)
 
     registro = db.relationship('Registro',
         backref=db.backref('asientos'))
@@ -59,7 +60,7 @@ class Asiento(db.Model, BaseModelMixin):
         self.id_cuenta = cuenta['id']
         self.descripcion = descripcion
         self.id_proveedor = proveedor['id']
-        self.debitocredito = debitocredito
+        self.debitocredito =  debitocredito
         self.valorbase = valorbase
         self.porcentaje = porcentaje
         self.valortotal = valortotal

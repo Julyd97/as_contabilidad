@@ -1,3 +1,4 @@
+from pydoc import plain
 from flask import Blueprint,session, render_template, send_from_directory
 from werkzeug.utils import redirect
 from cuentas.forms import ModificarForm
@@ -15,3 +16,10 @@ def index():
 @home_app.route('/images/<filename>')
 def image(filename):
     return send_from_directory(os.getcwd() + "/images/", filename=filename, as_attachment=False)
+
+# @home_app.route('/plan')
+# def plan():
+#     if session.get('full_name'):
+#         return redirect('/plan')
+#     return render_template('home/general.html', cache_id=random.randrange(10000))
+    

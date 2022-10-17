@@ -12,7 +12,7 @@ class Cartera(db.Model, BaseModelMixin):
     proveedor = db.Column(db.Boolean())
     centroCosto = db.Column(db.Boolean())
     naturaleza = db.Column(db.Boolean())
-    tipo = db.Column(db.String(5))
+    tipo = db.Column(db.String(15))
 
     def __init__(self, parent_id, nivel, serial, descripcion, cartera, tercero, proveedor, centroCosto, naturaleza, tipo):
         self.parent_id = parent_id

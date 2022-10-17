@@ -7,7 +7,7 @@ class RegistroSchema(ma.Schema):
     id_documentocontable = fields.Integer()
     consecutivo = fields.Integer()
     fecha = fields.Date()
-    id_proveedor = fields.Integer()
+    id_proveedor = fields.Integer(required=True)
     observaciones = fields.String()
 
 class AsientoSchema(ma.Schema):
@@ -20,6 +20,6 @@ class AsientoSchema(ma.Schema):
     valorbase = fields.Float()
     porcentaje = fields.Float()
     valortotal = fields.Float()
-    id_formapago = fields.Integer()
-    id_centrocosto = fields.Integer()
+    id_formapago = fields.Integer(allow_none = True)
+    id_centrocosto = fields.Integer(allow_none = True)
 

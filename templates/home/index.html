@@ -221,22 +221,24 @@
                         <h5 class="modal-title" id="ModalDocumentoContableCrearTitle">Nuevo Documento Contable</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                       </div>
-                      <form>
+                      <div class="obligatorio">
+                        <span>*Obligatorio</span>
+                      </div>
+                      <form id="enviardocumentoform">
                         <div class="modal-body">
                         
                           <div class="row container">
                             <div class="col-6 mb-3">
-                              <label for="tiponuevodocumento" class="form-label">Tipo Documento</label>
+                              <label for="tiponuevodocumento" class="form-label">Tipo Documento<span>*</span></label>
                               <select id="tiponuevodocumento" class="form-select">
-                                <option></option>
                                 <option value="cartera">Cartera</option>
                                 <option value="proveedor">Proveedor</option>
                                 <option value="facturacion">Facturación</option>
                               </select>
                             </div>
                             <div class="col-3 mb-3">
-                              <label for="prefijonuevodocumento" class="form-label">Prefijo</label>
-                              <input type="text" class="form-control" id="prefijonuevodocumento" maxlength="5" >
+                              <label for="prefijonuevodocumento" class="form-label">Prefijo<span>*</span></label>
+                              <input type="text" class="form-control" id="prefijonuevodocumento" maxlength="5" required>
                             </div>
                             <div class="col-3 mb-3">
                               <label for="plantillanuevodocumento" class="form-label">Plantilla</label>
@@ -248,17 +250,17 @@
                           </div>
                           <div class="row container">
                             <div class="col-3 mb-3">
-                              <label for="consecutivonuevodocumento" class="form-label">Consecutivo</label>
-                              <input type="number" class="form-control" id="consecutivonuevodocumento" >
+                              <label for="consecutivonuevodocumento" class="form-label">Consecutivo<span>*</span></label>
+                              <input type="number" class="form-control" id="consecutivonuevodocumento" required >
                             </div>
                             <div class="col-9 mb-3">
-                              <label for="descripcionnuevodocumento" class="form-label">Descripción</label>
-                              <input type="text" class="form-control" id="descripcionnuevodocumento" >
+                              <label for="descripcionnuevodocumento" class="form-label">Descripción<span>*</span></label>
+                              <input type="text" class="form-control" id="descripcionnuevodocumento" required>
                             </div>
                           </div>
                         </div>
                         <div class="modal-footer">
-                          <button id="enviarnuevodocumento" type="button" class="btn btn-primary" data-bs-dismiss="modal">Enviar</button>
+                          <button id="enviarnuevodocumento" type="submit" class="btn btn-primary">Enviar</button>
                           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
                         </div>
                       </form>
@@ -326,92 +328,100 @@
                           <h4 class="modal-title">Registro</h4>    
                           <button type="button" class="btn-close" data-bs-dismiss="modal"aria-label="Close"></button>
                         </div><div class="container"></div>
-                        <div class="modal-body">
-                          <div class="row">
-                            <div class="col-2"> 
-                              <select id="selecttipodocumento" class="form-select"></select>
+                        <form role="form" id="enviarregistroform">
+                          <div class="modal-body">
+                            <div class="row">
+                              <div class="col-2">
+                                <label for="selecttipodocumento">Documento</label>
+                                <select id="selecttipodocumento" class="form-select" required></select>
+                              </div>
+                              <div class="col-2">
+                                <label for="tipoconsecutivo">Consecutivo</label>
+                                <input type="number" class="inputsformulario" id="tipoconsecutivo" disabled>
+                              </div>
+                              <div class="col-2">
+                                <label for="tipofecha">Fecha</label>
+                                <input type="date" class="inputsformulario" id="tipofecha" >
+                              </div>
+                              <div class="col-4 p-0">
+                                <input type="text" class="inputsformulario seleccionproveedor" id="proveedorseleccionado" required disabled> 
+                              </div>
+                              <div class="col-2 p-0">
+                                <button type="button" data-bs-toggle="modal" data-bs-target="#myModal2" class="btn btn-primary seleccionproveedor" id="buttonproveedores" target="proveedorseleccionado">Proveedor</button>
+                              </div>
                             </div>
-                            <div class="col-2">
-                              <input type="number" class="inputsformulario" id="tipoconsecutivo" disabled>
+                            <div class="row">
+                              <div class="col-10">
+                                <label for="observacionesregistro" >Observaciones</label>
+                                <input type="text" id="observacionesregistro" class="form-control" required> 
+                              </div>
                             </div>
-                            <div class="col-2">
-                              <input type="date" class="inputsformulario" id="tipofecha" >
-                            </div>
-                            <div class="col-4 p-0">
-                              <input type="text" class="inputsformulario" id="proveedorseleccionado" disabled> 
-                            </div>
-                            <div class="col-2 p-0">
-                              <button data-bs-toggle="modal" data-bs-target="#myModal2" class="btn btn-primary" id="buttonproveedores" target="proveedorseleccionado">Proveedor</button>
+                            <table id="tableregistrodocumentos" class="table inputsformulario">
+                              <thead>
+                                <tr>
+                                  <th>Cuenta</th>
+                                  <th>Descripción</th>
+                                  <th>Tercero</th>
+                                  <th>D/C</th>
+                                  <th>Vr. Base</th>
+                                  <th>%</th>
+                                  <th>Valor</th>
+                                  <th>Forma de pago</th>
+                                  <th>C. Costo</th>
+                                  <th></th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <tr>
+                                    <th><input type="number" data-bs-toggle="modal" data-bs-target="#modalselectcuenta" id="inputcuenta"></th>
+                                    <th><input type="text" id="inputdescripcion" ></th>
+                                    <th><input type="text" id="inputtercero" data-bs-toggle="modal" data-bs-target="#myModal2" target="inputtercero"></th>
+                                    <th>
+                                      <select name="" class="form-select" id="debitocredito">
+                                        <option value="debito">D</option>
+                                        <option value="credito">C</option>
+                                      </select>
+                                    </th>
+                                    <th><input type="text" id="inputvalorbase" value=""></th>
+                                    <th><input type="number" id="porcentajevalor"  min="0" max="100"></th>
+                                    <th><input type="text" id="inputvalortotal" value=""></th>
+                                    <th>
+                                      <select name="" class=form-select>
+                                        <option value="debito"></option>
+                                      </select>
+                                    </th>
+                                    <th>
+                                      <select name="" class=form-select>
+                                        <option value="debito"></option>                                  
+                                      </select>
+                                    </th>
+                                    <th><button type="button" class="btn btn-success" id="buttonsend">+</button></th>
+                                </tr>
+                              </tbody>
+                            </table>
+                          </div>
+                          <div class="modal-footer">
+                            <div class="row" >
+                              <div class="col-3">
+                                <label for="sumadebitosregistro" >Debitos</label>
+                                <input type="text" id="sumadebitosregistro" disabled > 
+                              </div>
+                              <div class="col-3">
+                                <label for="sumacreditosregistro" >Creditos</label>
+                                <input type="text" id="sumacreditosregistro" disabled> 
+                              </div>
+                              <div class="col-2">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                              </div>
+                              <div class="col-2">
+                                <button id="sendregistro" type="submit" class="btn btn-success">Enviar</button>
+                              </div>
+                              <div class="col-2">
+                                <button id="borrarregistroform" type="button" class="btn btn-warning">Nuevo</button>
+                              </div>
                             </div>
                           </div>
-                          <div class="row">
-                            <div class="col-10">
-                              <label for="observacionesregistro" >Observaciones</label>
-                              <input type="text" id="observacionesregistro" class="form-control"> 
-                            </div>
-                          </div>
-                          <table id="tableregistrodocumentos" class="table inputsformulario">
-                            <thead>
-                              <tr>
-                                <th>Cuenta</th>
-                                <th>Descripción</th>
-                                <th>Tercero</th>
-                                <th>D/C</th>
-                                <th>Vr. Base</th>
-                                <th>%</th>
-                                <th>Valor</th>
-                                <th>Forma de pago</th>
-                                <th>C. Costo</th>
-                                <th></th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              <tr>
-                                  <th><input type="number" data-bs-toggle="modal" data-bs-target="#modalselectcuenta" id="inputcuenta"></th>
-                                  <th><input type="text" id="inputdescripcion" ></th>
-                                  <th><input type="text" id="inputtercero" data-bs-toggle="modal" data-bs-target="#myModal2" target="inputtercero"></th>
-                                  <th>
-                                    <select name="" class="form-select" id="debitocredito">
-                                      <option value="debito">D</option>
-                                      <option value="credito">C</option>
-                                    </select>
-                                  </th>
-                                  <th><input type="text" id="inputvalorbase" value=""></th>
-                                  <th><input type="number" id="porcentajevalor"  min="0" max="100"></th>
-                                  <th><input type="text" id="inputvalortotal" value=""></th>
-                                  <th>
-                                    <select name="" class=form-select>
-                                      <option value="debito"></option>
-                                    </select>
-                                  </th>
-                                  <th>
-                                    <select name="" class=form-select>
-                                      <option value="debito"></option>                                  
-                                    </select>
-                                  </th>
-                                  <th><button type="button" class="btn btn-success" id="buttonsend">+</button></th>
-                              </tr>
-                            </tbody>
-                          </table>
-                        </div>
-                        <div class="modal-footer">
-                          <div class="row" >
-                            <div class="col-3">
-                              <label for="sumadebitosregistro" >Debitos</label>
-                              <input type="text" id="sumadebitosregistro" > 
-                            </div>
-                            <div class="col-3">
-                              <label for="sumacreditosregistro" >Creditos</label>
-                              <input type="text" id="sumacreditosregistro" > 
-                            </div>
-                            <div class="col-2">
-                              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                            </div>
-                            <div class="col-2">
-                              <button id="sendregistro" type="button" class="btn btn-success" data-bs-dismiss="modal" onclick="createregistros()">Enviar</button>
-                            </div>
-                          </div>
-                        </div>
+                        </form>
                       </div>
                     </div>
                   </div>
@@ -494,18 +504,21 @@
               </div>
             </div>
             <div class="modal fade" id="modalnewproveedor" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-              <div class="modal-dialog">
+              <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                   <div class="modal-header">
                     <h5 class="modal-title" id="ModalProveedorCrearTitle">Nuevo Proveedor</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="obligatorio">
+                    <span>*Obligatorio</span>
                   </div>
                   <form id="enviarproveedorform">
                     <div class="modal-body">
                     
                       <div class="row container">
                         <div class="col-6 mb-3">
-                          <label for="primerNombre" class="form-label">Primer Nombre</label>
+                          <label for="primerNombre" class="form-label">Primer Nombre<span> *</span></label>
                           <input type="text" class="form-control" id="primerNombre"  maxlength="15" required>
                         </div>
                         <div class="col-6 mb-3">
@@ -515,7 +528,7 @@
                       </div>
                       <div class="row container">
                         <div class="col-6 mb-3">
-                          <label for="primerApellido" class="form-label">Primer Apellido</label>
+                          <label for="primerApellido" class="form-label">Primer Apellido<span> *</span></label>
                           <input type="text" class="form-control" id="primerApellido"  maxlength="15" required>
                         </div>
                         <div class="col-6 mb-3">
@@ -525,7 +538,7 @@
                       </div>
                       <div class="row container">
                         <div class="col-3 mb-3">
-                          <label for="tipoDocumento" class="form-label">Tipo Doc:</label>
+                          <label for="tipoDocumento" class="form-label">Tipo Doc<span> *</span></label>
                           <select id="tipoDocumento" class="form-select">
                             <option selected>C.C</option>
                             <option>C.E</option>
@@ -534,7 +547,7 @@
                           </select>
                         </div>
                         <div class="col-4 mb-3">
-                          <label for="numDocumento" class="form-label">N° Documento:</label>
+                          <label for="numDocumento" class="form-label">N° Documento<span>*</span></label>
                           <input type="number" class="form-control" id="numDocumento" pattern="[0-9]+" required >
                         </div>
                         <div class="col-5 mb-3">
@@ -593,7 +606,7 @@
                     
                       <div class="row container">
                         <div class="col-6 mb-3">
-                          <label for="primerNombrem" class="form-label">Primer Nombre</label>
+                          <label for="primerNombrem" class="form-label">Primer Nombre <span>*</span></label>
                           <input type="text" class="form-control" id="primerNombrem" maxlength="15" disabled required>
                         </div>
                         <div class="col-6 mb-3">
@@ -603,7 +616,7 @@
                       </div>
                       <div class="row container">
                         <div class="col-6 mb-3">
-                          <label for="primerApellidom" class="form-label">Primer Apellido</label>
+                          <label for="primerApellidom" class="form-label">Primer Apellido <span>*</span></label>
                           <input type="text" class="form-control" id="primerApellidom"  maxlength="15" disabled required>
                         </div>
                         <div class="col-6 mb-3">
@@ -613,7 +626,7 @@
                       </div>
                       <div class="row container">
                         <div class="col-3 mb-3">
-                          <label for="tipoDocumentom" class="form-label">Tipo Doc:</label>
+                          <label for="tipoDocumentom" class="form-label">Tipo Doc<span>*</span></label>
                           <select id="tipoDocumentom" class="form-select" disabled>
                             <option selected>C.C</option>
                             <option>C.E</option>
@@ -622,7 +635,7 @@
                           </select>
                         </div>
                         <div class="col-4 mb-3">
-                          <label for="numDocumentom" class="form-label">N° Documento:</label>
+                          <label for="numDocumentom" class="form-label">N° Documento<span>*</span></label>
                           <input type="number" class="form-control" pattern="[0-9]+" id="numDocumentom" disabled required >
                         </div>
                         <div class="col-5 mb-3">
@@ -696,14 +709,17 @@
                     <h5 class="modal-title" id="ModalCuentaNuevaTitle">Nueva Cuenta: </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                   </div>
+                  <div class="obligatorio">
+                    <span>*Obligatorio</span>
+                  </div>
                   <form role="form" id="enviarcuentaform">
                     <div class="modal-body">
                       <div class="form-group">
-                        <label for="serialnuevacuenta" class="form-label">Codigo</label>
+                        <label for="serialnuevacuenta" class="form-label">Codigo<span>*</span></label>
                         <input type="number" pattern="[0-9]+" max="99999999999999999999" size="20" class="form-control" id="serialnuevacuenta" required>
                       </div>
                       <div class="form-group">
-                        <label for="descripcionnuevacuenta" class="form-label">Descripción</label>
+                        <label for="descripcionnuevacuenta" class="form-label">Descripción<span>*</span></label>
                         <input type="text" class="form-control" id="descripcionnuevacuenta" maxlength="150" required>
                       </div>
                       <div class="form-group">
@@ -746,9 +762,11 @@
                           <label for="tipocuenta" id="labeltipocuenta">Tipo</label>
                           <div class="form-check">
                             <select name="tipocuenta" id="tipocuenta">
-                              <option>A</option>
-                              <option>P</option>
-                              <option>Pt</option>
+                              <option>Activo</option>
+                              <option>Pasivo</option>
+                              <option>Patrimonio</option>
+                              <option>Ingreso</option>
+                              <option>Gasto</option>
                             </select>
                           </div>
                         </div>
@@ -764,7 +782,7 @@
               </div>
             </div>
             <div class="modal fade" id="modalmodificarcuenta" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
-              <div class="modal-dialog modal-lg">
+              <div class="modal-dialog modal-md">
                 <div class="modal-content">
                   <div class="modal-header">
                     <h5 class="modal-title" id="modalmodificarcuentatitle">Cuenta Contable:</h5>
@@ -773,11 +791,11 @@
                   <form id="modificarcuentaform">
                     <div class="modal-body">
                       <div class="form-group">
-                        <label for="serialmodificarcuenta" class="form-label">Codigo</label>
+                        <label for="serialmodificarcuenta" class="form-label">Codigo<span>*</span></label>
                         <input type="number" class="form-control" id="serialmodificarcuenta" required >
                       </div>
                       <div class="form-group">
-                        <label for="descripcionmodificarcuenta" class="form-label">Descripción</label>
+                        <label for="descripcionmodificarcuenta" class="form-label">Descripción<span>*</span></label>
                         <input type="text" class="form-control" id="descripcionmodificarcuenta" maxlength="150" required >
                       </div>
                       <div class="form-group">
@@ -852,5 +870,6 @@
     <!-- <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script> -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ" crossorigin="anonymous"></script>
+    <script src="{{ url_for('static',filename='js/script.js') }}?{{ cache_id }}"></script>
     {% block script %}{% endblock %}
 </html>

@@ -2,6 +2,7 @@ from flask import Blueprint,render_template, redirect, session, url_for, flash, 
 from flask_mail import Mail,Message
 from werkzeug.security import generate_password_hash
 from itsdangerous import URLSafeTimedSerializer
+from functools import wraps
 import random
 import os
 
@@ -20,12 +21,20 @@ mail = Mail(app)
 
 ts = URLSafeTimedSerializer(secret_key=SECRET_KEY, salt = 'recover-key')
 
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if session.get('id') is None:
+            return redirect('/')
+        return f(*args, **kwargs)
+    return decorated_function
+
 @user_app.route('/send_email')
 def send_email(subject,recipients,body):
      with app.app_context():
             msg = Message(subject=subject,
                     sender=MAIL_USERNAME,
-                    recipients=recipients, 
+                      recipients=recipients, 
                     body=body)
             mail.send(msg)
 
@@ -70,6 +79,7 @@ def login():
     return render_template('user/login.html', form=form, error=error, cache_id=random.randrange(10000))
 
 @user_app.route('/logout')
+@login_required
 def logout():
     session.pop('id')
     session.pop('full_name')
@@ -110,3 +120,4 @@ def recover(token):
         db.session.commit()
         return redirect(url_for('.login'))
     return render_template('user/recover.html', form=form, token=token)    
+

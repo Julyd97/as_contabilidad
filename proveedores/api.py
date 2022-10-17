@@ -33,6 +33,8 @@ class ProveedorListResource(Resource):
         proveedor_dict = proveedor_schema.load(data)
         num_documento = proveedor_dict['numDocumento']
         proveedor_actual= Proveedor.query.filter_by(numDocumento = num_documento).first()
+        print(proveedor_dict)
+        
         if(proveedor_actual != None):
             return {'message': 'El proveedor que intenta crear ya esta creado.', 'alerta':'alert-danger', 'icon':'#exclamation-triangle-fill'}, 404
         else:
@@ -48,7 +50,8 @@ class ProveedorListResource(Resource):
                                     telefono = proveedor_dict['telefono'],
                                     correo = proveedor_dict['correo'],
                                     codigoPostal = proveedor_dict['codigoPostal']
-            )  
+            )
+
             proveedor.save()
             resp = proveedor_schema.dump(proveedor)
             return {'message':'El proveedor se creo exitosamente','alerta':'alert-success','icon':'#check-circle-fill'}, 201

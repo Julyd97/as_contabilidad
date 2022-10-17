@@ -40,8 +40,11 @@
     padding-top: 4rem;
 }
 .inputsformulario{
-    height: 100%;
+    height: 2.3rem;
     width: 100%;
+}
+.seleccionproveedor{
+    margin-top: 1.4rem;
 }
 .divselect{
     height: 550px !important; 
@@ -70,4 +73,26 @@ input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
+}
+#modalnewdocumentocontable span{
+    color: red;
+}
+#modalnewproveedor span{
+    color: red;
+    
+}
+#modalmodificarproveedor span{
+    color: red;
+    
+}
+#modalnewcuenta span{
+    color: red;
+    
+}
+#modalmodificarcuenta span{
+    color: red;
+    
+}
+.obligatorio{
+    padding-left: 1rem;
 }

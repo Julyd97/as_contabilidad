@@ -1,5 +1,5 @@
 body{
-    background-image: url("/images/general-image.jpg");
+    background-image: url("/images/recibo-home.jpg");
     background-size: 1200px 900px;
 
 }
@@ -14,13 +14,9 @@ a.btn{
     text-align: center;
 }
 #Logo{
-    height: 200px;
+    height: auto;
     width: 300px;
 }
 #form{
-    background-color: whitesmoke;
-    height: 250px;
-    width: 280px;
-    margin-left: 1px;
-    align-items: center;
+    background-color: transparent;
 }
