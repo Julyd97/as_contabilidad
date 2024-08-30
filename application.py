@@ -26,6 +26,8 @@ class BaseModelMixin:
     @classmethod
     def simple_filter(cls, **kwargs):
         return cls.query.filter_by(**kwargs).all()
+    
+
 def create_app(** config_overrides):
     app = Flask(__name__)
 
@@ -53,6 +55,8 @@ def create_app(** config_overrides):
     app.register_blueprint(user_app)
     app.register_blueprint(home_app)
     app.register_blueprint(cuenta_app)
+
+    
     app.register_blueprint(cartera_app)
     app.register_blueprint(proveedores_app)
     app.register_blueprint(documentoscontables_app)

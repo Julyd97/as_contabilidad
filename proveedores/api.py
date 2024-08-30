@@ -30,10 +30,13 @@ class ProveedorListResource(Resource):
         return result, 201
     def post(self):
         data = request.get_json()
-        proveedor_dict = proveedor_schema.load(data)
+        proveedor_dict = proveedor_schema.dump(data)
         num_documento = proveedor_dict['numDocumento']
         proveedor_actual= Proveedor.query.filter_by(numDocumento = num_documento).first()
+        print(proveedor_schema)
         print(proveedor_dict)
+        print('hola')
+        print(data)
         
         if(proveedor_actual != None):
             return {'message': 'El proveedor que intenta crear ya esta creado.', 'alerta':'alert-danger', 'icon':'#exclamation-triangle-fill'}, 404
@@ -51,7 +54,10 @@ class ProveedorListResource(Resource):
                                     correo = proveedor_dict['correo'],
                                     codigoPostal = proveedor_dict['codigoPostal']
             )
-
+            # proveedor1 = Proveedor(proveedor_dict)
+            print('hola')
+            resp = proveedor_schema.dump(proveedor)
+            print(resp)
             proveedor.save()
             resp = proveedor_schema.dump(proveedor)
             return {'message':'El proveedor se creo exitosamente','alerta':'alert-success','icon':'#check-circle-fill'}, 201
